@@ -1,5 +1,7 @@
 module ProjectEuler where 
 
+-- Generic Functions
+
 fib 0 = 0
 fib 1 = 1
 fib n = fib (n-1) + fib (n-2)
@@ -10,7 +12,7 @@ primes = 2: 3: sieve (tail primes) [5,7..]
   		sieve (p:ps) xs = h ++ sieve ps [x | x <- t, x `rem` p /= 0]  
   			where (h,~(_:t)) = span (< p*p) xs
 
--- Problems
+-- Problems 
 
 {- Completed 29.4.2013 -}
 problem_1 = sum [x | x <- [1..999], x `mod` 3 == 0 || x `mod` 5 == 0]
