@@ -1,10 +1,16 @@
 module ProjectEuler where 
-
+import Data.List
 -- Generic Functions
 
 fib 0 = 0
 fib 1 = 1
 fib n = fib (n-1) + fib (n-2)
+
+collatz :: (Integral a) => a -> [a]
+collatz 1 = [1]
+collatz m
+	| even m = m:collatz (m `div` 2)
+	| odd m = m:collatz (m * 3 + 1)
 
 primes :: [Integer]
 primes = 2: 3: sieve (tail primes) [5,7..]
@@ -48,3 +54,7 @@ problem_12 = head [triNum x | x <- [1..], numDivisiors x > 500]
 	where
 		triNum t = sum [1..t]
 		numDivisiors n = length [1 | x <- [1..n], x `mod` n == 0]
+
+{- 837799 - Completed 29.4.2013 -}
+problem_14 =  head (head [collatz x | x <- [999999,999998..1], (length (collatz x))  == maximum [length (collatz x) | x <- [1..999999]]])
+
