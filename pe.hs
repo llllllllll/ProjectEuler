@@ -78,6 +78,9 @@ problem_22 = sum [raw_score n * pos_mod n | n <- names]
 		char_pos c = (fromEnum c) - (fromEnum 'A') + 1
 		pos_mod n = length (takeWhile (/=n) names) + 1
 
+{- 2783915460 - Completed 5.5.2013 -}
+problem_24 =  (sort . permutations) ['0'..'9'] !! 999999
+
 {- 9183 - Completed 3.5.2013 -}
 problem_29 = length $ nub [a^b | a <- [2..100], b <- [2..100]] 
 
