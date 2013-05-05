@@ -1,2 +1,2 @@
-JoeJev Gets Learned a Haskell
+Joe Jevnik's Work on Project Euler in Haskell
 =============
