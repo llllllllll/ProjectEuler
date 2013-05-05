@@ -30,7 +30,8 @@ primes = 2: 3: sieve (tail primes) [5,7..]
   		sieve (p:ps) xs = h ++ sieve ps [x | x <- t, x `rem` p /= 0]  
   			where (h,~(_:t)) = span (< p*p) xs
 
-intToList n = map digitToInt $ show n
+int_to_list n = map digitToInt $ show n
+
 -- Problems
 
 {- 233168 - Completed 29.4.2013 -}
@@ -92,6 +93,6 @@ problem_29 = length $ nub [a^b | a <- [2..100], b <- [2..100]]
 problem_30 = sum [s | s <- [2..999999], ((sum . map (^5)) (intToList s)) == s]
 
 {- 40730 - Completed 5.5.2013 -}
-problem_34 = sum [x | x <- [3..99999], isCurious x]
+problem_34 = sum [x | x <- [3..99999], is_curious x]
 	where
-		isCurious n = (sum . map factorial) (intToList n) == n
+		is_curious n = (sum . map factorial) (intToList n) == n
