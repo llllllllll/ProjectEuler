@@ -86,13 +86,17 @@ problem_22 = sum [raw_score n * pos_mod n | n <- names]
 {- 2783915460 - Completed 5.5.2013 -}
 problem_24 =  (sort . permutations) ['0'..'9'] !! 999999
 
+
 {- 9183 - Completed 3.5.2013 -}
 problem_29 = length $ nub [a^b | a <- [2..100], b <- [2..100]] 
 
 {- 443839 - Completed 5.5.2013 -}
-problem_30 = sum [s | s <- [2..999999], ((sum . map (^5)) (intToList s)) == s]
+problem_30 = sum [s | s <- [2..999999], ((sum . map (^5)) (int_to_list s)) == s]
 
 {- 40730 - Completed 5.5.2013 -}
 problem_34 = sum [x | x <- [3..99999], is_curious x]
 	where
-		is_curious n = (sum . map factorial) (intToList n) == n
+		is_curious n = (sum . map factorial) (int_to_list n) == n
+
+{- 9110846700 - Completed 5.5.2013 -}
+problem_48 = reverse $ take 10 $ (reverse . show . sum) (map (\x -> x^x) [1..1000])
