@@ -2,6 +2,7 @@ module ProjectEuler where
 import Data.List
 import Data.Bits
 import Data.Char
+
 -- Generic Functions
 
 fib 0 = 0
@@ -26,7 +27,7 @@ primes = 2: 3: sieve (tail primes) [5,7..]
   		sieve (p:ps) xs = h ++ sieve ps [x | x <- t, x `rem` p /= 0]  
   			where (h,~(_:t)) = span (< p*p) xs
 
--- Problems 
+-- Problems
 
 {- 233168 - Completed 29.4.2013 -}
 problem_1 = sum [x | x <- [1..999], x `mod` 3 == 0 || x `mod` 5 == 0]
@@ -84,4 +85,3 @@ problem_29 = length $ nub [a^b | a <- [2..100], b <- [2..100]]
 problem_30 = sum [s | s <- [2..999999], ((sum . map (^5)) (toList s)) == s]
 	where
 		toList n = map digitToInt $ show n
-
