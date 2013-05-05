@@ -80,3 +80,8 @@ problem_22 = sum [raw_score n * pos_mod n | n <- names]
 {- 9183 - Completed 3.5.2013 -}
 problem_29 = length $ nub [a^b | a <- [2..100], b <- [2..100]] 
 
+{- 443839 - Completed 5.5.2013 -}
+problem_30 = sum [s | s <- [2..999999], ((sum . map (^5)) (toList s)) == s]
+	where
+		toList n = map digitToInt $ show n
+
