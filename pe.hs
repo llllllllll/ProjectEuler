@@ -12,7 +12,7 @@ fib n = fib (n-1) + fib (n-2)
 factorial 0 = 1
 factorial n = n * factorial (n-1)
 
-divisors n = [1 | x <- [1..n], x `mod` n == 0]
+divisors n = [x | x <- [1..n], n `mod` x == 0]
 numDivisiors n = (length . divisors) n
 
 pentagonal n = n * (3*n) / 2
@@ -64,16 +64,16 @@ problem_10 = sum $ takeWhile (<2000000) primes
 
 problem_11 = error "Not Completed In Haskell"
 
-problem_12 = head [triNum x | x <- [1..], numDivisiors x > 500]
+problem_12 = head [tri_num x | x <- [1..], numDivisiors . tri_num) x > 500]
 	where
-		triNum t = sum [1..t]
+		tri_num t = sum [1..t]
 
 {- 837799 - Completed 29.4.2013 -}
 problem_14 =  head (head [collatz x | x <- [999999,999998..1], (length (collatz x))  == maximum [length (collatz x) | x <- [1..999999]]])
 
-problem_21 = (sum . nub . concat) [a:[b] | a <- [1..999], b <- [1..a], isAmicable a b]
+problem_21 = (sum . nub . concat) [a:[b] | a <- [1..999], b <- [1..a], is_amicable a b]
 	where 
-		isAmicable a b =  a /= b && (sum . divisors) a == b && (sum . divisors) b == a
+		is_amicable a b =  a /= b && (sum . divisors) a == b && (sum . divisors) b == a
 
 {- 871198282 - Completed 5.5.2013 -}
 problem_22 = sum $ map (\n -> raw_score n * pos_mod n) names
