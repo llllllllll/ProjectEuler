@@ -41,7 +41,7 @@ problem_1 = sum [x | x <- [1..999], x `mod` 3 == 0 || x `mod` 5 == 0]
 problem_2 = sum [x | x <- takeWhile (<4000000) (map fib [2..]), even x]
 
 
-problem_3 = last [n | n -> divisors 600851475143, n `elem` primes]
+problem_3 = head [n | n <- (reverse . divisors) 600851475143, n `elem` primes]
 
 {- 906609 - Completed 29.4.2013 -}
 problem_4 = maximum [x*y | x <- [100..999], y <- [100..999], reverse (show (x*y)) == show (x*y)]
