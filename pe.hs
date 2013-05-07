@@ -3,36 +3,56 @@ import Data.List
 import Data.Bits
 import Data.Char
 
--- Generic Functions
+--Lists:
 
-fib 0 = 0
-fib 1 = 1
-fib n = fib (n-1) + fib (n-2)
-
-factorial 0 = 1
-factorial n = n * factorial (n-1)
-
-divisors n = [x | x <- [1..n], n `mod` x == 0]
-numDivisiors n = (length . divisors) n
-
-pentagonal n = n * (3*n) / 2
-pentagonals = [pentagonal x | x <- [1..]]
-
-collatz :: (Integral a) => a -> [a]
-collatz 1 = [1]
-collatz m
-	| even m = m:collatz (m `div` 2)
-	| odd m = m:collatz (m * 3 + 1)
-
+{- An infinite list of prime numbers -}
 primes :: [Integer]
 primes = 2: 3: sieve (tail primes) [5,7..]
 	where 
   		sieve (p:ps) xs = h ++ sieve ps [x | x <- t, x `rem` p /= 0]  
   			where (h,~(_:t)) = span (< p*p) xs
 
+{- A list of all divisors of n -}
+divisors :: Integral a => a -> [a]
+divisors n = [x | x <- [1..n], n `mod` x == 0]
+
+{- A list of all divisors of n in reverse order -}
+r_divisors :: Integral a => a -> [a]
+r_divisors n = [x | x <- [n, n-1..1], n `mod` x == 0]
+
+--Sequences:
+
+{- Fibonacci Sequence starting at n -}
+fib 0 = 0
+fib 1 = 1
+fib n = fib (n-1) + fib (n-2)
+
+{- Collatz Sequence starting at n -}
+collatz :: Integral a => a -> [a]
+collatz 1 = [1]
+collatz n
+	| even n = n:collatz (n `div` 2)
+	| odd n = n:collatz (n * 3 + 1)
+
+--Functions:
+
+{- factorial n = n! -}
+factorial 0 = 1
+factorial n = n * factorial (n-1)
+
+{- The number of divisors of n -}
+num_divisors n = (length . divisors) n
+
+{- Bool whether n is a prime number or not -}
+is_prime n = n `elem` primes
+
+{- convert an Integral to a list of its digits. eg: int_to_list 123 = [1,2,3] -}
 int_to_list n = map digitToInt $ show n
 
--- Problems
+{- Inverse of int_to_list. Convert a list into an Integral where each element is a digit. eg: list_to_int [1,2,3] = 123 -}
+list_to_int ns = read (foldl (++) "" (map (show) ns)) :: Integer
+
+--Problems:
 
 {- 233168 - Completed 29.4.2013 -}
 problem_1 = sum [x | x <- [1..999], x `mod` 3 == 0 || x `mod` 5 == 0]
@@ -41,7 +61,7 @@ problem_1 = sum [x | x <- [1..999], x `mod` 3 == 0 || x `mod` 5 == 0]
 problem_2 = sum [x | x <- takeWhile (<4000000) (map fib [2..]), even x]
 
 
-problem_3 = head [n | n <- (reverse . divisors) 600851475143, n `elem` primes]
+problem_3 = error "Not Completed In Haskell"
 
 {- 906609 - Completed 29.4.2013 -}
 problem_4 = maximum [x*y | x <- [100..999], y <- [100..999], reverse (show (x*y)) == show (x*y)]
@@ -64,7 +84,7 @@ problem_10 = sum $ takeWhile (<2000000) primes
 
 problem_11 = error "Not Completed In Haskell"
 
-problem_12 = head [tri_num x | x <- [1..], numDivisiors . tri_num) x > 500]
+problem_12 = head [tri_num x | x <- [1..], (num_divisors . tri_num) x > 500]
 	where
 		tri_num t = sum [1..t]
 
@@ -98,8 +118,18 @@ problem_34 = sum [x | x <- [3..99999], is_curious x]
 	where
 		is_curious n = (sum . map factorial) (int_to_list n) == n
 
+{-problem_35 = length [1 | n <- takeWhile (<1000000) primes, is_valid n]
+	where
+		is_valid n = foldl (&&) (True) $ map (is_prime . list_to_int) ((circulate . int_to_list) n)
+		circulate ns = init (zipWith (++) (tails ns) (inits ns))
+		-}
+
+problem_40 = 
+	where
+		l = show $ list_to_int [1..999]
+
 {- 9110846700 - Completed 5.5.2013 -}
-problem_48 = reverse $ take 10 $ (reverse . show . sum) (map (\x -> x^x) [1..1000])
+problem_48 = reverse $ take 10 $ (reverse . show . sum) (map (\x -> x^x) [1..6])
 
 problem_52 = head [n | n <- [1..], is_valid n]
 	where
