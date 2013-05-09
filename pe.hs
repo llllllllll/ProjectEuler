@@ -113,7 +113,7 @@ problem_21 = (sum . nub . concat) [a:[b] | a <- [1..999], b <- [1..a], is_amicab
 {- 871198282 - Completed 5.5.2013 -}
 problem_22 = sum $ map (\n -> raw_score n * pos_mod n) names
 	where
-		names = "" --Names.txt can be found on the website, I just ommited to clean it up.
+		names = [""] --Names.txt can be found on the website, I just ommited to clean it up.
 		raw_score n = (sum . map char_pos) n
 		char_pos c = (fromEnum c) - (fromEnum 'A') + 1
 		pos_mod n = length (takeWhile (/=n) names) + 1
@@ -133,7 +133,7 @@ problem_34 = sum [x | x <- [3..99999], is_curious x]
 	where
 		is_curious n = (sum . map factorial) (int_to_list n) == n
 
-problem_35 = length [1 | n <- takeWhile (<1000000) primes, is_valid n]
+problem_35 = [1 | n <- takeWhile (<1000000) primes, is_valid n]
 	where
 		is_valid n = foldl (&&) (True) $ map (is_prime . list_to_int) ((circulate . int_to_list) n)
 		circulate ns = init (zipWith (++) (tails ns) (inits ns))
@@ -157,4 +157,3 @@ problem_104 = head $ filter (\x -> is_pandigital 1 9 (head_n 9 x) && is_pandigit
 problem_112 = takeWhile (\x -> p_bouncy x < 0.99) [21700..]
 	where
 		p_bouncy n = fromIntegral (length (filter (is_bouncy) [1..n])) / (fromIntegral n)
-
