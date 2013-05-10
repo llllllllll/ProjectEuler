@@ -58,7 +58,7 @@ is_increasing n = (sort . show) n == (show n)
 {- Returns a Bool as to whether a number is decreasing. eg: is_increasing 1234 = False, is_increasing 4321 = True -}
 is_decreasing n = (reverse . sort . show) n == (show n)
 
-is_pandigital a b n = (sort . int_to_list) n == (sort [a..b])
+is_pandigital a b n = (nub . sort . int_to_list) n == (sort [a..b])
 
 head_n d n = list_to_int $ take d (int_to_list n)
 
@@ -138,6 +138,8 @@ problem_35 = [1 | n <- takeWhile (<1000000) primes, is_valid n]
 		is_valid n = foldl (&&) (True) $ map (is_prime . list_to_int) ((circulate . int_to_list) n)
 		circulate ns = init (zipWith (++) (tails ns) (inits ns))
 
+problem_40 = show $ list_to_int [1..10000]
+
 {- 9110846700 - Completed 5.5.2013 -}
 problem_48 = end_n 10 (sum (map (\x -> x^x) [1..1000]))
 
@@ -148,6 +150,9 @@ problem_52 = head [n | n <- [1..], is_valid n]
 
 {- 4075 - Completed 8.5.2013 -}
 problem_53 = length [1 | n <- [1..100], r <- [1..n], n `nCr` r > 1000000]
+
+{- 972 - Completed 10.5.2013 -}
+problem_56 = maximum $ [(sum . int_to_list) (a^b) | a <- [1..99], b <- [1..99]]
 
 {- 8739992577 - Completed 8.5.2013 -}
 problem_97 = end_n 10 $ 28433*2^(7830457)+1
