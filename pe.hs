@@ -72,6 +72,14 @@ n `nCr` r = factorial n / (factorial r * factorial (n-r))
 {- returns the number of times n occurs in list ns -}
 elem_count n ns =  (length . nubBy (/=)) (n:ns) - 1
 
+{- Returns if n is an Integral to 7 decimal places -}
+is_int :: RealFrac a => a -> Bool
+is_int n = (round $ 10^(fromIntegral 7)*(n-(fromIntegral $ round n))) == 0
+
+is_square n = is_int (fromIntegral (n) **(0.5))
+
+
+
 
 --Problems--
 
@@ -177,8 +185,13 @@ problem_112 = takeWhile (\x -> p_bouncy x < 0.99) [21700..]
 	where
 		p_bouncy n = fromIntegral (length (filter (is_bouncy) [1..n])) / (fromIntegral n)
 
+problem_211 = sum [n | n <- [1..64000000], is_valid n]
+	where
+		is_valid :: Integral a => a -> Bool
+		is_valid n = is_square $ sum (map (^2) (divisors n))
+
 {- 1.002322108633 (Paper/Pencil)- Completed 11.5.2013 -}
-problem_235 = error "Not Done In Haskell"
+problem_235 = error "Not Completed In Haskell"
 
 problem_371 =  [(n-1)*p | n <- [1..10]]
 	where
