@@ -2,6 +2,7 @@ module ProjectEuler where
 import Data.List
 import Data.Bits
 import Data.Char
+import Data.Function
 
 --Lists--
 
@@ -76,10 +77,22 @@ elem_count n ns =  (length . nubBy (/=)) (n:ns) - 1
 is_int :: RealFrac a => a -> Bool
 is_int n = (round $ 10^(fromIntegral 7)*(n-(fromIntegral $ round n))) == 0
 
+{- Returns True if n is a perfect square -}
 is_square n = is_int (fromIntegral (n) **(0.5))
 
+{- Returns a list of all numbers prime to n -}
+euler_totient n = [x | x <- [1..n], x `gcd` n == 1]
 
-
+{- A Binary Search (I know it is less efficient than a linear search) -}
+binary_search n ns = binary_search' n ns 0 (length ns - 1)
+	where
+		binary_search' n ns a b
+			| ns !! c == n = c
+			| ns !! c > n = binary_search' n ns a (c-1)
+			| ns !! c < n = binary_search' n ns (c+1) b
+			| otherwise = -1
+			where c = floor (fromIntegral (a + b) / 2)
+		
 
 --Problems--
 
@@ -175,6 +188,11 @@ problem_53 = genericLength [1 | n <- [1..100], r <- [1..n], n `nCr` r > 1000000]
 
 {- 972 - Completed 10.5.2013 -}
 problem_56 = maximum $ [(sum . int_to_list) (a^b) | a <- [1..99], b <- [1..99]]
+
+problem_69 = head $ sortBy (phi_compare) [(x, x `div` phi x) | x <- takeWhile (<1000000) primes]
+	where
+		phi n = genericLength $ euler_totient n
+		phi_compare = compare `on` snd
 
 {- 8739992577 - Completed 8.5.2013 -}
 problem_97 = end_n 10 $ 28433*2^(7830457)+1
