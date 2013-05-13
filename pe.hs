@@ -3,6 +3,8 @@ import Data.List
 import Data.Bits
 import Data.Char
 import Data.Function
+import Data.Array
+
 
 --Lists--
 
@@ -84,14 +86,13 @@ is_square n = is_int (fromIntegral (n) **(0.5))
 euler_totient n = [x | x <- [1..n], x `gcd` n == 1]
 
 {- A Binary Search (I know it is less efficient than a linear search) -}
-binary_search n ns = binary_search' n ns 0 (length ns - 1)
-	where
-		binary_search' n ns a b
-			| ns !! c == n = c
-			| ns !! c > n = binary_search' n ns a (c-1)
-			| ns !! c < n = binary_search' n ns (c+1) b
-			| otherwise = -1
-			where c = floor (fromIntegral (a + b) / 2)
+binary_search n ns = binary_search' n ns 0 ((snd . bounds) ns - (fst . bounds) ns)
+binary_search' n ns a b
+	| ns ! c == n = c
+	| ns ! c > n = binary_search' n ns a (c-1)
+	| ns ! c < n = binary_search' n ns (c+1) b
+	| otherwise = -1
+	where c = floor (fromIntegral (a + b) / 2)
 		
 
 --Problems--
