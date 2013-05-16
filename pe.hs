@@ -4,6 +4,7 @@ import Data.Bits
 import Data.Char
 import Data.Function
 import Data.Array
+import Data.Ratio
 
 
 --Lists--
@@ -19,9 +20,20 @@ primes = 2: 3: sieve (tail primes) [5,7..]
 divisors :: Integral a => a -> [a]
 divisors n = [x | x <- takeWhile (<=ceiling ((fromIntegral n)/2)) [1..], n `mod` x == 0]
 
+prime_factors n = factor primes n
+  where 
+    factor ps@(p:pt) n | p*p > n      = [n]               
+                       | rem n p == 0 = p : factor ps (quot n p) 
+                       | otherwise    =     factor pt n
+
+prime_factors_mult = map encode . group . prime_factors
+    where encode xs = (head xs, length xs)
+
 {- A list of all divisors of n in reverse order -}
 r_divisors :: Integral a => a -> [a]
 r_divisors n = [x | x <- [n, n-1..1], n `mod` x == 0]
+
+champernowne = concatMap show [0..]
 
 --Sequences--
 
@@ -52,7 +64,7 @@ is_prime n = n == (head $ primes \\ (takeWhile (<n) primes))
 int_to_list n = map digitToInt $ show n
 
 {- Inverse of int_to_list. Convert a list into an Integral where each element is a digit. eg: list_to_int [1,2,3] = 123 -}
-list_to_int ns = read (foldl (++) "" (map (show) ns)) :: Integer
+list_to_int ns = read $ concatMap show ns :: Integer
 
 {- Returns a Bool whether a number is neither increasing or decreasing -}
 is_bouncy n = not (is_increasing (int_to_list n) || is_decreasing (int_to_list n))
@@ -62,12 +74,13 @@ is_increasing n = (sort . show) n == (show n)
 is_decreasing n = (reverse . sort . show) n == (show n)
 
 {- Returns if n is pandigital with bounds a..b -}
-is_pandigital a b n = (nub . sort . int_to_list) n == (sort [a..b])
+is_pandigital a b n = (nub . sort . int_to_list) n == [a..b]
+is_pandigital' a b n = (sort . int_to_list) n == [a..b]
 
 {- Returns the first d digits of n -}
 head_n d n = list_to_int $ take d (int_to_list n)
 {- Returns the last d digits of n -}
-end_n d n = reverse $ take d $ (reverse . show) n
+last_n d n = reverse $ take d $ (reverse . show) n
 
 {- Number of combinations of n choose r -}
 n `nCr` r = factorial n / (factorial r * factorial (n-r))
@@ -82,10 +95,16 @@ is_int n = (round $ 10^(fromIntegral 7)*(n-(fromIntegral $ round n))) == 0
 {- Returns True if n is a perfect square -}
 is_square n = is_int (fromIntegral (n) **(0.5))
 
-{- Returns a list of all numbers prime to n -}
-euler_totient n = [x | x <- [1..n], x `gcd` n == 1]
+{- The size of the list of numbers coprime to n -}
+euler_totient m = product [(p - 1) * p ^ (c - 1) | (p, c) <- prime_factors_mult m]
 
-{- A Binary Search (I know it is less efficient than a linear search) -}
+is_lychrel n = is_lychrel' n 0
+is_lychrel' n c
+	| (reverse . show) n == show n && c /= 0 = False
+	| c == 50 = True
+	| otherwise = is_lychrel' (list_to_int ((reverse . int_to_list) n) + n) (c+1)
+
+{- A Binary Search-}
 binary_search n ns = binary_search' n ns 0 ((snd . bounds) ns - (fst . bounds) ns)
 binary_search' n ns a b
 	| ns ! c == n = c
@@ -132,6 +151,10 @@ problem_12 = head [tri_num x | x <- [1..], (num_divisors . tri_num) x > 500]
 	where
 		tri_num t = sum [1..t]
 
+{- 5537376230 - Completed 15.5.2013 -}
+problem_13 = head_n 10 a
+	where a = 0 -- Sum all the numbers on the site.
+
 {- 837799 - Completed 29.4.2013 -}
 problem_14 =  head (head [collatz x | x <- [999999,999998..1], (length (collatz x))  == maximum [length (collatz x) | x <- [1..999999]]])
 
@@ -164,7 +187,11 @@ problem_29 = length $ nub [a^b | a <- [2..100], b <- [2..100]]
 {- 443839 - Completed 5.5.2013 -}
 problem_30 = sum [s | s <- [2..999999], ((sum . map (^5)) (int_to_list s)) == s]
 
+problem_32 = sum $ nub [a*b | a <- [1..10000], b <- [1..a], is_valid a b]
+	where
+		is_valid a b = is_pandigital' 1 9 (list_to_int [a*b,a,b])
 {- 40730 - Completed 5.5.2013 -}
+
 problem_34 = sum [x | x <- [3..99999], is_curious x]
 	where
 		is_curious n = (sum . map factorial) (int_to_list n) == n
@@ -174,10 +201,13 @@ problem_35 = [1 | n <- takeWhile (<1000000) primes, is_valid n]
 		is_valid n = foldl (&&) (True) $ map (is_prime . list_to_int) ((circulate . int_to_list) n)
 		circulate ns = init (zipWith (++) (tails ns) (inits ns))
 
-problem_40 = length $ show (list_to_int [1..10000])
+{- 210 - Completed 15.5.2013 -}
+problem_40 = product $ map (digitToInt . (!!) champernowne) indecies
+	where
+		indecies = map (10^) [1..6]
 
 {- 9110846700 - Completed 5.5.2013 -}
-problem_48 = end_n 10 (sum (map (\x -> x^x) [1..1000]))
+problem_48 = last_n 10 (sum (map (\x -> x^x) [1..1000]))
 
 {- 142857 - Completed 5.5.2013 -}
 problem_52 = head [n | n <- [1..], is_valid n]
@@ -187,18 +217,23 @@ problem_52 = head [n | n <- [1..], is_valid n]
 {- 4075 - Completed 8.5.2013 -}
 problem_53 = genericLength [1 | n <- [1..100], r <- [1..n], n `nCr` r > 1000000]
 
+{- 249 - Completed 15.5.2013 -}
+problem_55 = length [n | n <- [1..9999], is_lychrel n]
+
 {- 972 - Completed 10.5.2013 -}
 problem_56 = maximum $ [(sum . int_to_list) (a^b) | a <- [1..99], b <- [1..99]]
 
-problem_69 = head $ sortBy (phi_compare) [(x, x `div` phi x) | x <- takeWhile (<1000000) primes]
+{- 510510 - Completed 16.5.2013 -}
+problem_69 =  last $ sortBy (compare `on` snd) [(n, (fromIntegral n) / (fromIntegral . euler_totient) n) | n <- [2..1000000]]
+
+problem_70 = head $ sortBy (compare `on` snd) [(n, (fromIntegral n) / (fromIntegral . euler_totient) n) | n <- [2..10^7], is_valid n]
 	where
-		phi n = genericLength $ euler_totient n
-		phi_compare = compare `on` snd
+		is_valid n = (sort . show . euler_totient) n == (sort . show) n
 
 {- 8739992577 - Completed 8.5.2013 -}
-problem_97 = end_n 10 $ 28433*2^(7830457)+1
+problem_97 = last_n 10 $ 28433*2^(7830457)+1
 
-problem_104 = head $ filter (\x -> is_pandigital 1 9 (head_n 9 x) && is_pandigital 1 9 (end_n 9 x)) (map (fib) [1..])
+problem_104 = head $ filter (\x -> is_pandigital 1 9 (head_n 9 x) && is_pandigital 1 9 (last_n 9 x)) (map (fib) [1..])
 
 problem_112 = takeWhile (\x -> p_bouncy x < 0.99) [21700..]
 	where
