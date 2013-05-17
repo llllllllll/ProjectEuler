@@ -20,19 +20,22 @@ primes = 2: 3: sieve (tail primes) [5,7..]
 divisors :: Integral a => a -> [a]
 divisors n = [x | x <- takeWhile (<=ceiling ((fromIntegral n)/2)) [1..], n `mod` x == 0]
 
+{- A list of all divisors of n in reverse order -}
+r_divisors :: Integral a => a -> [a]
+r_divisors n = [x | x <- [n, n-1..1], n `mod` x == 0]
+
+{- The primes factors of n -}
 prime_factors n = factor primes n
   where 
     factor ps@(p:pt) n | p*p > n      = [n]               
                        | rem n p == 0 = p : factor ps (quot n p) 
                        | otherwise    =     factor pt n
-
 prime_factors_mult = map encode . group . prime_factors
     where encode xs = (head xs, length xs)
+{- Euler's number -}
+e = exp 1
 
-{- A list of all divisors of n in reverse order -}
-r_divisors :: Integral a => a -> [a]
-r_divisors n = [x | x <- [n, n-1..1], n `mod` x == 0]
-
+{- Champernown's constant -}
 champernowne = concatMap show [0..]
 
 --Sequences--
@@ -98,6 +101,7 @@ is_square n = is_int (fromIntegral (n) **(0.5))
 {- The size of the list of numbers coprime to n -}
 euler_totient m = product [(p - 1) * p ^ (c - 1) | (p, c) <- prime_factors_mult m]
 
+{- Detirmines if a number is a lychrel number, a number that does not converge to a palindrome -}
 is_lychrel n = is_lychrel' n 0
 is_lychrel' n c
 	| (reverse . show) n == show n && c /= 0 = False
@@ -145,7 +149,34 @@ problem_9 = error "Not Completed In Haskell"
 {- 142913828922 - Completed 29.4.2013 -}
 problem_10 = sum $ takeWhile (<2000000) primes
 
-problem_11 = error "Not Completed In Haskell"
+{- 70600674 - Completed 16.5.2013 -}
+problem_11 = maximum [maximum [horizontal r n | r <- [0..19], n <- [0..15]], maximum [vertical r n | r <- [0..15], n <- [0..19]], maximum [d_right r n | r <- [0..15], n <- [0..15]], maximum [d_left r n | r <- [3..15], n <- [3..15]]]
+	where 
+		horizontal r n = grid!r!n * grid!r!(n+1) * grid!r!(n+2) * grid!r!(n+3)
+		vertical r n = grid!r!n * grid!(r+1)!n * grid!(r+2)!n * grid!(r+3)!n
+		d_right r n = grid!r!n * grid!(r+1)!(n+1) * grid!(r+2)!(n+2) * grid!(r+3)!(n+3)
+		d_left r n = grid!r!n * grid!(r-1)!(n+1) * grid!(r-2)!(n+2) * grid!(r-3)!(n+3)
+		grid = listArray (0,19) 
+			[listArray (0,19) [08, 02, 22, 97, 38, 15, 00, 40, 00, 75, 04, 05, 07, 78, 52, 12, 50, 77, 91, 08],
+			listArray (0,19) [49, 49, 99, 40, 17, 81, 18, 57, 60, 87, 17, 40, 98, 43, 69, 48, 04, 56, 62, 00],
+			listArray (0,19) [81, 49, 31, 73, 55, 79, 14, 29, 93, 71, 40, 67, 53, 88, 30, 03, 49, 13, 36, 65],
+			listArray (0,19) [52, 70, 95, 23, 04, 60, 11, 42, 69, 24, 68, 56, 01, 32, 56, 71, 37, 02, 36, 91],
+			listArray (0,19) [22, 31, 16, 71, 51, 67, 63, 89, 41, 92, 36, 54, 22, 40, 40, 28, 66, 33, 13, 80],
+			listArray (0,19) [24, 47, 32, 60, 99, 03, 45, 02, 44, 75, 33, 53, 78, 36, 84, 20, 35, 17, 12, 50],
+			listArray (0,19) [32, 98, 81, 28, 64, 23, 67, 10, 26, 38, 40, 67, 59, 54, 70, 66, 18, 38, 64, 70],
+			listArray (0,19) [67, 26, 20, 68, 02, 62, 12, 20, 95, 63, 94, 39, 63, 08, 40, 91, 66, 49, 94, 21],
+			listArray (0,19) [24, 55, 58, 05, 66, 73, 99, 26, 97, 17, 78, 78, 96, 83, 14, 88, 34, 89, 63, 72],
+			listArray (0,19) [21, 36, 23, 09, 75, 00, 76, 44, 20, 45, 35, 14, 00, 61, 33, 97, 34, 31, 33, 95],
+			listArray (0,19) [78, 17, 53, 28, 22, 75, 31, 67, 15, 94, 03, 80, 04, 62, 16, 14, 09, 53, 56, 92],
+			listArray (0,19) [16, 39, 05, 42, 96, 35, 31, 47, 55, 58, 88, 24, 00, 17, 54, 24, 36, 29, 85, 57],
+			listArray (0,19) [86, 56, 00, 48, 35, 71, 89, 07, 05, 44, 44, 37, 44, 60, 21, 58, 51, 54, 17, 58],
+			listArray (0,19) [19, 80, 81, 68, 05, 94, 47, 69, 28, 73, 92, 13, 86, 52, 17, 77, 04, 89, 55, 40],
+			listArray (0,19) [04, 52, 08, 83, 97, 35, 99, 16, 07, 97, 57, 32, 16, 26, 26, 79, 33, 27, 98, 66],
+			listArray (0,19) [88, 36, 68, 87, 57, 62, 20, 72, 03, 46, 33, 67, 46, 55, 12, 32, 63, 93, 53, 69],
+			listArray (0,19) [04, 42, 16, 73, 38, 25, 39, 11, 24, 94, 72, 18, 08, 46, 29, 32, 40, 62, 76, 36],
+			listArray (0,19) [20, 69, 36, 41, 72, 30, 23, 88, 34, 62, 99, 69, 82, 67, 59, 85, 74, 04, 36, 16],
+			listArray (0,19) [20, 73, 35, 29, 78, 31, 90, 01, 74, 31, 49, 71, 48, 86, 81, 16, 23, 57, 05, 54],
+			listArray (0,19) [01, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52, 01, 89, 19, 67, 48]]
 
 problem_12 = head [tri_num x | x <- [1..], (num_divisors . tri_num) x > 500]
 	where
@@ -157,6 +188,9 @@ problem_13 = head_n 10 a
 
 {- 837799 - Completed 29.4.2013 -}
 problem_14 =  head (head [collatz x | x <- [999999,999998..1], (length (collatz x))  == maximum [length (collatz x) | x <- [1..999999]]])
+
+{- 137846528820 - Completed 17.5.2013 -}
+problem_15 = 40 `nCr` 20 --Binomial Coefficient for solving lattice paths.
 
 {- 648 - Completed 11.5.2013 -}
 problem_20 = (sum . int_to_list) $ factorial 100
@@ -190,8 +224,8 @@ problem_30 = sum [s | s <- [2..999999], ((sum . map (^5)) (int_to_list s)) == s]
 problem_32 = sum $ nub [a*b | a <- [1..10000], b <- [1..a], is_valid a b]
 	where
 		is_valid a b = is_pandigital' 1 9 (list_to_int [a*b,a,b])
-{- 40730 - Completed 5.5.2013 -}
 
+{- 40730 - Completed 5.5.2013 -}
 problem_34 = sum [x | x <- [3..99999], is_curious x]
 	where
 		is_curious n = (sum . map factorial) (int_to_list n) == n
@@ -226,7 +260,7 @@ problem_56 = maximum $ [(sum . int_to_list) (a^b) | a <- [1..99], b <- [1..99]]
 {- 510510 - Completed 16.5.2013 -}
 problem_69 =  last $ sortBy (compare `on` snd) [(n, (fromIntegral n) / (fromIntegral . euler_totient) n) | n <- [2..1000000]]
 
-problem_70 = head $ sortBy (compare `on` snd) [(n, (fromIntegral n) / (fromIntegral . euler_totient) n) | n <- [2..10^7], is_valid n]
+problem_70 = reverse $ sortBy (compare `on` snd) [(n, (fromIntegral n) / (fromIntegral . euler_totient) n) | n <- [2..10^7]]
 	where
 		is_valid n = (sort . show . euler_totient) n == (sort . show) n
 
@@ -238,6 +272,10 @@ problem_104 = head $ filter (\x -> is_pandigital 1 9 (head_n 9 x) && is_pandigit
 problem_112 = takeWhile (\x -> p_bouncy x < 0.99) [21700..]
 	where
 		p_bouncy n = fromIntegral (length (filter (is_bouncy) [1..n])) / (fromIntegral n)
+
+problem_142 = head [x+y+z | x <- [1..1000], y <- [1..(x-1)], z <- [1..(y-1)], is_valid x y z]
+	where
+		is_valid x y z = foldl (&&) True (map is_square [(x+y),(x-y),(x+z),(x-z),(y+z),(y-z)])
 
 problem_211 = sum [n | n <- [1..64000000], is_valid n]
 	where
