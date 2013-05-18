@@ -6,7 +6,6 @@ import Data.Function
 import Data.Array
 import Data.Ratio
 
-
 --Lists--
 
 {-An infinite list of prime numbers-}
@@ -132,7 +131,20 @@ binary_search' n ns a b
 	| ns ! c < n = binary_search' n ns (c+1) b
 	| otherwise = -1
 	where c = floor (fromIntegral (a + b) / 2)
-		
+
+bisection_search f n (a,b) eps
+	| f a > f b = b_search_dec f n (a,b) eps
+	|otherwise = b_search_inc f n (a,b) eps
+b_search_inc f n (a,b) eps
+	| f c == n || (b-a)/2 < eps = c
+	| f c > n = b_search_inc f n (a, c) eps
+	| otherwise = b_search_inc f n (c, b) eps
+	where c = (a+b)/2.0
+b_search_dec f n (a,b) eps
+	| f c == n || (b-a)/2 < eps = c
+	| f c < n = b_search_dec f n (a, c) eps
+	| otherwise = b_search_dec f n (c, b) eps
+	where c = (a+b)/2.0
 
 --Problems--
 
@@ -323,9 +335,14 @@ problem_211 = sum [n | n <- [1..64000000], is_valid n]
 		is_valid :: Integral a => a -> Bool
 		is_valid n = is_square $ sum (map (^2) (divisors n))
 
-{-1.002322108633 (Paper/Pencil)- Completed 11.5.2013 - Learned how to binary search by hand.-}
-problem_235 = error "Not Completed In Haskell"
+{-1.002322108633 (Paper/Pencil)- Completed 11.5.2013 - Learned how to bisection search by hand.-}
+problem_235 = bisection_search f (0-600000000000) (1,1.5) 0.000000000001
+	where
+		f r = sum [(900-3*k)*r**(k-1) | k <- [1..5000]]
 
 problem_371 =  [(n-1)*p | n <- [1..10]]
 	where
 		p = 999/1000000
+
+problem_379 = sum $ map f [1..1000]
+f n = length [(x,y) |  y <- [1..n], x <- [1..y-1], x `lcm` y == n]
