@@ -8,6 +8,7 @@ import Data.Ratio
 
 --Lists--
 
+
 {-An infinite list of prime numbers-}
 primes :: [Integer]
 primes = 2: 3: sieve (tail primes) [5,7..]
@@ -89,7 +90,12 @@ last_n d n = reverse $ take d $ (reverse . show) n
 n `nCr` r = factorial n / (factorial r * factorial (n-r))
 
 {-returns the number of times n occurs in list ns-}
-elem_count n ns =  (length . nubBy (/=)) (n:ns) - 1
+elem_count n ns =  elem_count' n ns 0
+	where
+	elem_count' n ns c
+		| null ns = c
+		| head ns == n = elem_count' n (tail ns) (c+1)
+		| otherwise = elem_count' n (tail ns) c
 
 {-Returns if n is an Integral to 7 decimal places-}
 is_int :: RealFrac a => a -> Bool
@@ -123,13 +129,13 @@ is_lychrel' n c
 	| c == 50 = True
 	| otherwise = is_lychrel' (list_to_int ((reverse . int_to_list) n) + n) (c+1)
 
-{-A Binary Search for arays-}
+{-A Binary Search for arrays-}
 binary_search n ns = binary_search' n ns 0 ((snd . bounds) ns - (fst . bounds) ns)
 binary_search' n ns a b
 	| ns ! c == n = c
 	| ns ! c > n = binary_search' n ns a (c-1)
 	| ns ! c < n = binary_search' n ns (c+1) b
-	| otherwise = -1
+	| otherwise = 0-1
 	where c = floor (fromIntegral (a + b) / 2)
 
 bisection_search f n (a,b) eps
@@ -343,6 +349,3 @@ problem_235 = bisection_search f (0-600000000000) (1,1.5) 0.000000000001
 problem_371 =  [(n-1)*p | n <- [1..10]]
 	where
 		p = 999/1000000
-
-problem_379 = sum $ map f [1..1000]
-f n = length [(x,y) |  y <- [1..n], x <- [1..y-1], x `lcm` y == n]
