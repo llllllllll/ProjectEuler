@@ -8,7 +8,6 @@ import Data.Ratio
 
 --Lists--
 
-
 {-An infinite list of prime numbers-}
 primes :: [Integer]
 primes = 2: 3: sieve (tail primes) [5,7..]
@@ -130,11 +129,11 @@ is_lychrel' n c
 	| otherwise = is_lychrel' (list_to_int ((reverse . int_to_list) n) + n) (c+1)
 
 {-A Binary Search for arrays-}
-binary_search n ns = binary_search' n ns 0 ((snd . bounds) ns - (fst . bounds) ns)
-binary_search' n ns a b
-	| ns ! c == n = c
-	| ns ! c > n = binary_search' n ns a (c-1)
-	| ns ! c < n = binary_search' n ns (c+1) b
+binary_search n arr = binary_search' n arr 0 (a_length arr)
+binary_search' n arr a b
+	| arr ! c == n = c
+	| arr ! c > n = binary_search' n arr a (c-1)
+	| arr ! c < n = binary_search' n arr (c+1) b
 	| otherwise = 0-1
 	where c = floor (fromIntegral (a + b) / 2)
 
@@ -152,6 +151,7 @@ b_search_dec f n (a,b) eps
 	| otherwise = b_search_dec f n (c, b) eps
 	where c = (a+b)/2.0
 
+a_length arr = (snd . bounds) arr - (fst . bounds) arr
 --Problems--
 
 {-233168 - Completed 29.4.2013-}
@@ -226,7 +226,7 @@ problem_14 =  head (head [collatz x | x <- [999999,999998..1], (length (collatz 
 {-137846528820 - Completed 17.5.2013 - Learned about binomial coefficients for solving lattice paths.-}
 problem_15 = 40 `nCr` 20 
 
-{-648 - Completed 11.5.2013-}
+{-648 - Completed 11.5.2013,-}
 problem_20 = (sum . int_to_list) $ factorial 100
 
 {-31725 - Completed 12.5.2013 - Started working on typing-}
@@ -243,11 +243,6 @@ problem_22 = sum $ map (\n -> raw_score n * pos_mod n) names
 		raw_score n = (sum . map char_pos) n
 		char_pos c = (fromEnum c) - (fromEnum 'A') + 1
 		pos_mod n = length (takeWhile (/=n) names) + 1
-
-problem_23 = sum [n | n <- [1..28123], is_valid n]
-	where
-		is_valid n = null [0 | a <- [1..n], b <- [n-1,n-2..1], (a+b) == n && is_abundant a && is_abundant b]
-		is_abundant n = (sum . divisors) n > n
 
 {-2783915460 - Completed 5.5.2013-}
 problem_24 =  (sort . permutations) ['0'..'9'] !! 999999
@@ -279,6 +274,13 @@ problem_40 = product $ map (digitToInt . (!!) champernowne) indecies
 	where
 		indecies = map (10^) [1..6]
 
+{-16695334890 - Completed 21.5.2013 -}
+problem_43 = sum $ (map (read) [x | x <- permutations ['0'..'9'], is_valid x] :: [Integer])
+	where
+		is_valid x = (even . read) [x!!1,x!!2,x!!3] && read [x!!2,x!!3,x!!4] `mod` 3 == 0 && read [x!!3,x!!4,x!!5] `mod` 5 == 0
+				&& read [x!!4,x!!5,x!!6] `mod` 7 == 0 && read [x!!5,x!!6,x!!7] `mod` 11 == 0 && read [x!!6,x!!7,x!!8] `mod` 13 == 0
+				&& read [x!!7,x!!8,x!!9] `mod` 17 == 0 
+
 {-134043 - Completed 17.5.2013-}
 problem_47 = head [n | n <- [1..], is_valid n]
 	where
@@ -304,9 +306,7 @@ problem_56 = maximum $ [(sum . int_to_list) (a^b) | a <- [1..99], b <- [1..99]]
 {-510510 - Completed 16.5.2013 - Learned Euler Totient (phi(n)).-}
 problem_69 =  last $ sortBy (compare `on` snd) [(n, (fromIntegral n) / (fromIntegral . euler_totient) n) | n <- [2..1000000]]
 
-problem_70 = reverse $ sortBy (compare `on` snd) [(n, (fromIntegral n) / (fromIntegral . euler_totient) n) | n <- [2..10^7]]
-	where
-		is_valid n = (sort . show . euler_totient) n == (sort . show) n
+problem_70 = head [x | x <- (sortBy (compare `on` snd) [(n, ((fromIntegral n)/(fromIntegral (euler_totient n)))) | n <- [1..10^7]]), (sort . show) (fst x) == (sort . show . euler_totient) (fst x)]
 
 {-428572 - Completed 17.5.2013 - Used Farey Sequences learned in problem 72.-}
 problem_71 = farey_seq (0%1) (3%7)
