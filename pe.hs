@@ -87,6 +87,7 @@ last_n d n = reverse $ take d $ (reverse . show) n
 
 {-Number of combinations of n choose r-}
 n `nCr` r = factorial n / (factorial r * factorial (n-r))
+n `nPr` r = factorial n / factorial (n-r)
 
 {-returns the number of times n occurs in list ns-}
 elem_count n ns =  elem_count' n ns 0
@@ -106,10 +107,10 @@ is_square n = is_int (fromIntegral (n) **(0.5))
 {-The size of the list of numbers coprime to n-}
 euler_totient m = product [(p - 1) * p ^ (c - 1) | (p, c) <- prime_factors_mult m]
 
-{-Farey Sequence-}
-farey_seq a b
-    |da2<=10^6=farey_seq a1 b
-    |otherwise=na
+{-Farey Sequence term to the left of b with a power of p-}
+farey_seq_term a b p
+    |da2<=p=farey_seq_term a1 b p
+    |otherwise=na%nb
     where
     	na=numerator a
     	nb=numerator b
@@ -152,6 +153,13 @@ b_search_dec f n (a,b) eps
 	where c = (a+b)/2.0
 
 a_length arr = (snd . bounds) arr - (fst . bounds) arr
+
+split_on     :: (Char -> Bool) -> String -> [String]
+split_on p s =  case dropWhile p s of
+                      "" -> []
+                      s' -> w : split_on p s''
+                            where (w, s'') = break p s'
+
 --Problems--
 
 {-233168 - Completed 29.4.2013-}
@@ -306,13 +314,24 @@ problem_56 = maximum $ [(sum . int_to_list) (a^b) | a <- [1..99], b <- [1..99]]
 {-510510 - Completed 16.5.2013 - Learned Euler Totient (phi(n)).-}
 problem_69 =  last $ sortBy (compare `on` snd) [(n, (fromIntegral n) / (fromIntegral . euler_totient) n) | n <- [2..1000000]]
 
-problem_70 = head [x | x <- (sortBy (compare `on` snd) [(n, ((fromIntegral n)/(fromIntegral (euler_totient n)))) | n <- [1..10^7]]), (sort . show) (fst x) == (sort . show . euler_totient) (fst x)]
+problem_70 = phi_perm 2 1000
+	where
+		phi_perm n m
+			| n >= 10^7 = m
+			| (sort . show) n == (sort . show . euler_totient) n && n%euler_totient n < m%euler_totient m = phi_perm (n+1) n
+			| (sort . show) n == (sort . show . euler_totient) n && n%euler_totient n > m% euler_totient m = phi_perm (n+1) m
+			| otherwise = phi_perm (n+1) m
 
 {-428572 - Completed 17.5.2013 - Used Farey Sequences learned in problem 72.-}
-problem_71 = farey_seq (0%1) (3%7)
+problem_71 = farey_seq_term (0%1) (3%7) (10^6)
 
 {-303963552391 - Completed 17.5.2013 - Learned Farey Sequences-}
 problem_72 = farey_seq_length 1000000 
+
+problem_73 = f_seq (1%3) (1%2) 12000 []
+f_seq a b p ns
+	| farey_seq_term (0%1) b p == a = ns
+	| otherwise = f_seq a (farey_seq_term (0%1) b p) p ((farey_seq_term (0%1) b p):ns)
 
 {-402 - Completed 17.5.2013 - Learned about Factorial Chains.-}
 problem_74 = length [f_chain n| n <- [1..999999], is_valid n]
@@ -323,8 +342,23 @@ problem_74 = length [f_chain n| n <- [1..999999], is_valid n]
 			| n `elem` ns = length ns
 			| otherwise = f_chain' ((sum . map factorial) (int_to_list n)) (n:ns)
 
+{-8581146 - Completed 22.5.2013 - Learned about forcing strictness -}
+problem_92 = length $ [n | n <- [1..100000], sq_chain n]
+	where
+		sq_chain n
+			| n == 1 = False
+			| n == 89 = True
+			| otherwise = sq_chain $! (sum (map (^2) (int_to_list n)))
+
 {-8739992577 - Completed 8.5.2013-}
 problem_97 = last_n 10 $ 28433*2^(7830457)+1
+
+{-709 - Completed 22.5.2013 - Learned how to work with IO -}
+problem_99 = do
+	file <- readFile "base_exp.txt"
+	putStrLn "Add 1 to index to get answer\nFormat: (index, value)"
+	return $ maximumBy (compare `on` snd) $ map (\(l, a, b) -> (l, (read b)*log (read a)) ) [(str `elemIndex` (lines file), head (split_on (==',') str), (last (split_on (==',') str))) | str <- lines file]
+
 
 problem_104 = head $ filter (\x -> is_pandigital 1 9 (head_n 9 x) && is_pandigital 1 9 (last_n 9 x)) (map (fib) [1..])
 
