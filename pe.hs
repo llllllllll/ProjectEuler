@@ -61,7 +61,13 @@ factorial n = product [1..n]
 num_divisors n = (length . divisors) n
 
 {-Bool whether n is a prime number or not-}
-is_prime n = n == (head $ primes \\ (takeWhile (<n) primes))
+is_prime n = is_prime' n (floor $ sqrt $ fromIntegral n)
+	where 
+		is_prime' n i
+			| i == 1 && n > 1 = True
+			| n == i*(n `div` i) = False
+			| otherwise = is_prime' n (i-1)
+	
 
 {-convert an Integral to a list of its digits. eg: int_to_list 123 = [1,2,3]-}
 int_to_list n = map digitToInt $ show n
@@ -70,11 +76,25 @@ int_to_list n = map digitToInt $ show n
 list_to_int ns = read $ concatMap show ns :: Integer
 
 {-Returns a Bool whether a number is neither increasing or decreasing-}
-is_bouncy n = not (is_increasing (int_to_list n) || is_decreasing (int_to_list n))
-{-Returns a Bool as to whether a number is increasing. eg: is_increasing 1234 = True, is_increasing 4321 = False-}
-is_increasing n = (sort . show) n == (show n)
-{-Returns a Bool as to whether a number is decreasing. eg: is_increasing 1234 = False, is_increasing 4321 = True-}
-is_decreasing n = (reverse . sort . show) n == (show n)
+is_bouncy n = not (is_increasing n || is_decreasing n)
+
+{-Returns a Bool as to whether a number is increasing. eg: is_increasing 12344 = True, is_increasing 44321 = False-}
+is_increasing n = is_increasing' (head (show n)) (tail (show n))
+	where
+		is_increasing' n (h:t)
+			| null (h:t) = False
+			| null t  && n <= h = True
+			| n <= h = is_increasing' h t
+			| otherwise = False
+
+{-Returns a Bool as to whether a number is decreasing. eg: is_decreasing 12344 = False, is_decreasing 44321 = True-}
+is_decreasing n = is_decreasing' (head (show n)) (tail (show n))
+	where
+		is_decreasing' n (h:t)
+			| null (h:t) = False
+			| null t && n >= h = True
+			| n >= h = is_decreasing' h t
+			| otherwise = False
 
 {-Returns if n is pandigital with bounds a..b-}
 is_pandigital a b n = (nub . sort . int_to_list) n == [a..b]
@@ -234,6 +254,7 @@ problem_14 =  head (head [collatz x | x <- [999999,999998..1], (length (collatz 
 {-137846528820 - Completed 17.5.2013 - Learned about binomial coefficients for solving lattice paths.-}
 problem_15 = 40 `nCr` 20 
 
+
 {-648 - Completed 11.5.2013,-}
 problem_20 = (sum . int_to_list) $ factorial 100
 
@@ -251,6 +272,7 @@ problem_22 = sum $ map (\n -> raw_score n * pos_mod n) names
 		raw_score n = (sum . map char_pos) n
 		char_pos c = (fromEnum c) - (fromEnum 'A') + 1
 		pos_mod n = length (takeWhile (/=n) names) + 1
+
 
 {-2783915460 - Completed 5.5.2013-}
 problem_24 =  (sort . permutations) ['0'..'9'] !! 999999
@@ -271,16 +293,28 @@ problem_32 = sum $ nub [a*b | a <- [1..10000], b <- [1..a], is_valid a b]
 problem_34 = sum [x | x <- [3..99999], is_curious x]
 	where
 		is_curious n = (sum . map factorial) (int_to_list n) == n
-
-problem_35 = [1 | n <- takeWhile (<1000000) primes, is_valid n]
+{- 55 - Completed 23.5.2013 -}
+problem_35 = length [n | n <- takeWhile (<1000000) primes, is_valid n]
 	where
-		is_valid n = foldl (&&) (True) $ map (is_prime . list_to_int) ((circulate . int_to_list) n)
 		circulate ns = init (zipWith (++) (tails ns) (inits ns))
+		is_valid n = all (is_prime . list_to_int) $ circulate (int_to_list n)
+
+problem_39 = [a+b+c | a <- [1..998], b <- [1..a], c <- [1..b], (a+b+c) <= 1000 && (a^2 + b^2) == c^2]
 
 {-210 - Completed 15.5.2013 - Leaned about Champernowne's Constant.-}
 problem_40 = product $ map (digitToInt . (!!) champernowne) indecies
 	where
 		indecies = map (10^) [1..6]
+
+{-162 - Completed 23.5.2013 -}
+problem_42 = do
+	file <- readFile "words.txt"
+	let words = split_on (==',') file
+	let	char_pos c = (fromEnum c) - (fromEnum 'A') + 1
+		is_tri str = is_tri_num $ sum $ map (char_pos) str
+		tri_nums = [fromIntegral (n*(n+1) `div` 2) | n <- [1..]]
+		is_tri_num n = n == head (dropWhile (<n) tri_nums)
+	return $ length [filter (/='\"') str | str <- words, is_tri (filter (/='\"') str)]
 
 {-16695334890 - Completed 21.5.2013 -}
 problem_43 = sum $ (map (read) [x | x <- permutations ['0'..'9'], is_valid x] :: [Integer])
@@ -362,24 +396,37 @@ problem_99 = do
 
 problem_104 = head $ filter (\x -> is_pandigital 1 9 (head_n 9 x) && is_pandigital 1 9 (last_n 9 x)) (map (fib) [1..])
 
-problem_112 = takeWhile (\x -> p_bouncy x < 0.99) [21700..]
+{-1587000 - Completed 22.5.2013 -}
+problem_112 = p 21780 19602
 	where
-		p_bouncy n = fromIntegral (length (filter (is_bouncy) [1..n])) / (fromIntegral n)
+		p n a
+			| a%n >= (99%100) = n
+			| is_bouncy n = p (n+1) (a+1)
+			| otherwise = p (n+1) a
 
 problem_142 = head [x+y+z | x <- [1..1000], y <- [1..(x-1)], z <- [1..(y-1)], is_valid x y z]
 	where
 		is_valid x y z = foldl (&&) True (map is_square [(x+y),(x-y),(x+z),(x-z),(y+z),(y-z)])
+
+problem_145 = length [(n, rev n) | n <- [1..10^9], is_reversable $! show (rev n)] - 5
+	where
+		is_reversable (h:t)
+			| even (digitToInt h) = False
+			| null t && odd (digitToInt h) = True
+			| otherwise = is_reversable t
+		rev n = n + (read $ reverse $ show n) :: Integer
+		
 
 problem_211 = sum [n | n <- [1..64000000], is_valid n]
 	where
 		is_valid :: Integral a => a -> Bool
 		is_valid n = is_square $ sum (map (^2) (divisors n))
 
+problem_216 = length $ intersect primes [n | n <- [1..50000000]]
+
+
+
 {-1.002322108633 (Paper/Pencil)- Completed 11.5.2013 - Learned how to bisection search by hand.-}
 problem_235 = bisection_search f (0-600000000000) (1,1.5) 0.000000000001
 	where
-		f r = sum [(900-3*k)*r**(k-1) | k <- [1..5000]]
-
-problem_371 =  [(n-1)*p | n <- [1..10]]
-	where
-		p = 999/1000000
+		f r = sum [(900-3*k)*r**(k-1) | k <- [1..5000]] 
