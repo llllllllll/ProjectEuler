@@ -186,6 +186,13 @@ split_on p s =  case dropWhile p s of
                       s' -> w : split_on p s''
                             where (w, s'') = break p s'
 
+partitions n = 1 + sum [p' k (n-k) | k <-[1..floor ((fromIntegral n) /2)]]
+	where p' k n
+		| k > n = 0
+		| k == n = 1
+		| otherwise = p' (k+1) (n) + p' k (n-k)
+
+
 --Problems--
 
 {-233168 - Completed 29.4.2013-}
