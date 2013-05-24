@@ -13,8 +13,8 @@ import Numeric
 primes :: [Integer]
 primes = 2: 3: sieve (tail primes) [5,7..]
 	where 
-  		sieve (p:ps) xs = h ++ sieve ps [x | x <- t, x `rem` p /= 0]  
-  			where (h,~(_:t)) = span (< p*p) xs
+  		sieve (p:ps) xs = n ++ sieve ps [x | x <- ns, x `rem` p /= 0]  
+  			where (n,~(_:ns)) = span (< p*p) xs
 
 {-A list of all divisors of n-}
 divisors :: Integral a => a -> [a]
@@ -82,24 +82,29 @@ is_bouncy n = not (is_increasing n || is_decreasing n)
 {-Returns a Bool as to whether a number is increasing. eg: is_increasing 12344 = True, is_increasing 44321 = False-}
 is_increasing n = is_increasing' (head (show n)) (tail (show n))
 	where
-		is_increasing' n (h:t)
-			| null (h:t) = False
-			| null t  && n <= h = True
-			| n <= h = is_increasing' h t
+		is_increasing' n (x:xs)
+			| null (x:xs) = False
+			| null xs  && x <= n = True
+			| x <= n = is_increasing' x xs
 			| otherwise = False
 
 {-Returns a Bool as to whether a number is decreasing. eg: is_decreasing 12344 = False, is_decreasing 44321 = True-}
 is_decreasing n = is_decreasing' (head (show n)) (tail (show n))
 	where
-		is_decreasing' n (h:t)
-			| null (h:t) = False
-			| null t && n >= h = True
-			| n >= h = is_decreasing' h t
+		is_decreasing' n (x:xs)
+			| null (x:xs) = False
+			| null xs && x >= n = True
+			| x >= n = is_decreasing' x xs
 			| otherwise = False
 
 {-Returns if n is pandigital with bounds a..b-}
-is_pandigital a b n = (nub . sort . int_to_list) n == [a..b]
-is_pandigital' a b n = (sort . int_to_list) n == [a..b]
+is_pandigitalr (a,b) n = (nub . sort . int_to_list) n == [a..b]
+is_pandigital (a,b) n = is_pandigital' [a..b] (int_to_list n) []
+	where
+		is_pandigital' ab (n:ns) vals
+			| n `elem` ab && not (n `elem` vals) && null ns = True
+			| n `elem` ab && not ( n `elem` vals) = is_pandigital' ab ns (n:vals)
+			| otherwise = False
 
 {-Returns the first d digits of n-}
 head_n d n = list_to_int $ take d (int_to_list n)
@@ -175,7 +180,7 @@ b_search_dec f n (a,b) eps
 
 a_length arr = (snd . bounds) arr - (fst . bounds) arr
 
-split_on     :: (Char -> Bool) -> String -> [String]
+split_on :: (Char -> Bool) -> String -> [String]
 split_on p s =  case dropWhile p s of
                       "" -> []
                       s' -> w : split_on p s''
@@ -243,7 +248,7 @@ problem_11 = maximum [maximum [horizontal r n | r <- [0..19], n <- [0..15]], max
 
 problem_12 = head [tri_num x | x <- [1..], (num_divisors . tri_num) x > 500]
 	where
-		tri_num t = sum [1..t]
+		tri_num ns = sum [1..ns]
 
 {-5537376230 - Completed 15.5.2013-}
 problem_13 = head_n 10 a
@@ -288,7 +293,7 @@ problem_30 = sum [s | s <- [2..999999], ((sum . map (^5)) (int_to_list s)) == s]
 
 problem_32 = sum $ nub [a*b | a <- [1..10000], b <- [1..a], is_valid a b]
 	where
-		is_valid a b = is_pandigital' 1 9 (list_to_int [a*b,a,b])
+		is_valid a b = is_pandigital (1,9) (list_to_int [a*b,a,b])
 
 {-100 - Completed 23.5.2013 -}
 problem_33 = denominator $ product [a%b | a <- [10..99], b <- [10..99],  a%b < 1 && a /= b && a `mod` 10 /= 0 && b `mod` 10 /= 0 && is_valid a b]
@@ -299,6 +304,7 @@ problem_33 = denominator $ product [a%b | a <- [10..99], b <- [10..99],  a%b < 1
 problem_34 = sum [x | x <- [3..99999], is_curious x]
 	where
 		is_curious n = (sum . map factorial) (int_to_list n) == n
+
 {-55 - Completed 23.5.2013 -}
 problem_35 = length [n | n <- takeWhile (<1000000) primes, is_valid n]
 	where
@@ -312,6 +318,9 @@ problem_39 = round $ head $ last $ sortBy (compare `on` length) $ group $ sort [
 problem_40 = product $ map (digitToInt . (!!) champernowne) indecies
 	where
 		indecies = map (10^) [1..6]
+
+{-7652413 - Completed 24.5.2013 - WARNING: Does not terminate! -}
+problem_41 = [n | n <- primes, is_pandigitalr (1,(length . show) n) n]
 
 {-162 - Completed 23.5.2013 -}
 problem_42 = do
@@ -401,7 +410,7 @@ problem_99 = do
 	return $ maximumBy (compare `on` snd) $ map (\(l, a, b) -> (l, (read b)*log (read a)) ) [(str `elemIndex` (lines file), head (split_on (==',') str), (last (split_on (==',') str))) | str <- lines file]
 
 
-problem_104 = head $ filter (\x -> is_pandigital 1 9 (head_n 9 x) && is_pandigital 1 9 (last_n 9 x)) (map (fib) [1..])
+problem_104 = head $ filter (\x -> is_pandigitalr (1,9) (head_n 9 x) && is_pandigitalr (1,9) (last_n 9 x)) (map (fib) [1..])
 
 {-1587000 - Completed 22.5.2013 -}
 problem_112 = p 21780 19602
@@ -417,10 +426,10 @@ problem_142 = head [x+y+z | x <- [1..1000], y <- [1..(x-1)], z <- [1..(y-1)], is
 
 problem_145 = length [(n, rev n) | n <- [1..10^9], is_reversable $! show (rev n)] - 5
 	where
-		is_reversable (h:t)
-			| even (digitToInt h) = False
-			| null t && odd (digitToInt h) = True
-			| otherwise = is_reversable t
+		is_reversable (n:ns)
+			| even (digitToInt n) = False
+			| null ns && odd (digitToInt n) = True
+			| otherwise = is_reversable ns
 		rev n = n + (read $ reverse $ show n) :: Integer
 
 problem_211 = sum [n | n <- [1..64000000], is_valid n]
