@@ -5,7 +5,6 @@ import Data.Char
 import Data.Function
 import Data.Array
 import Data.Ratio
-import Numeric
 
 --Lists--
 
@@ -290,23 +289,17 @@ problem_32 = sum $ nub [a*b | a <- [1..10000], b <- [1..a], is_valid a b]
 	where
 		is_valid a b = is_pandigital' 1 9 (list_to_int [a*b,a,b])
 
-{-100 - Completed 23.5.2013 -}
-problem_33 = denominator $ product [a%b | a <- [10..99], b <- [10..99],  a%b < 1 && a /= b && a `mod` 10 /= 0 && b `mod` 10 /= 0 && is_valid a b]
-	where
-		is_valid a b = (not . null) (intersect (int_to_list a) (int_to_list b)) && let s = head (intersect (int_to_list a) (int_to_list b)) in (list_to_int (delete s (int_to_list a))) % (list_to_int (delete s (int_to_list b))) == a%b
-
 {-40730 - Completed 5.5.2013-}
 problem_34 = sum [x | x <- [3..99999], is_curious x]
 	where
 		is_curious n = (sum . map factorial) (int_to_list n) == n
-{-55 - Completed 23.5.2013 -}
+{- 55 - Completed 23.5.2013 -}
 problem_35 = length [n | n <- takeWhile (<1000000) primes, is_valid n]
 	where
 		circulate ns = init (zipWith (++) (tails ns) (inits ns))
 		is_valid n = all (is_prime . list_to_int) $ circulate (int_to_list n)
 
-{- 840 - Completed 24.5.2013 -}
-problem_39 = round $ head $ last $ sortBy (compare `on` length) $ group $ sort [let c = sqrt (a^2 + b^2) in a+b+c | a <- [1..998], b <- [1..a], let c = sqrt (a^2 + b^2) in is_int c && (a+b+c) <= 1000 && (a^2 + b^2) == c^2]
+problem_39 = [a+b+c | a <- [1..998], b <- [1..a], c <- [1..b], (a+b+c) <= 1000 && (a^2 + b^2) == c^2]
 
 {-210 - Completed 15.5.2013 - Leaned about Champernowne's Constant.-}
 problem_40 = product $ map (digitToInt . (!!) champernowne) indecies
@@ -422,6 +415,7 @@ problem_145 = length [(n, rev n) | n <- [1..10^9], is_reversable $! show (rev n)
 			| null t && odd (digitToInt h) = True
 			| otherwise = is_reversable t
 		rev n = n + (read $ reverse $ show n) :: Integer
+		
 
 problem_211 = sum [n | n <- [1..64000000], is_valid n]
 	where
