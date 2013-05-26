@@ -7,6 +7,7 @@ import Data.Array
 import Data.Ratio
 import Numeric
 
+
 --Lists--
 
 {-An infinite list of prime numbers-}
@@ -42,16 +43,25 @@ champernowne = concatMap show [0..]
 --Sequences--
 
 {-Fibonacci Sequence starting at n-}
-fib 0 = 0
-fib 1 = 1
-fib n = fib (n-1) + fib (n-2)
+fib = ((map f [0..])!!)
+	where
+		f 0 = 0
+		f 1 = 1
+		f n = fib (n-1) + fib (n-2)
 
 {-Collatz Sequence starting at n-}
-collatz :: Integral a => a -> [a]
-collatz 1 = [1]
+collatz_mem = ((map c [0..])!!)
+	where
+		c 1 = [1]
+		c n
+			| even n = n:collatz_mem (n`div`2)
+			| odd n = n:collatz_mem (n*3+1)
+
+collatz 1 = []
 collatz n
-	| even n = n:collatz (n `div` 2)
-	| odd n = n:collatz (n * 3 + 1)
+	| even n = n:collatz (n`div`2)
+	| odd n = n:collatz (n*3+1)
+
 
 --Functions--
 
@@ -59,7 +69,8 @@ collatz n
 factorial n = product [1..n]
 
 {-The number of divisors of n-}
-num_divisors n = (length . divisors) n
+num_divisors :: Integral a => a -> Integer
+num_divisors n = (genericLength . divisors) n
 
 {-Bool whether n is a prime number or not-}
 is_prime n = is_prime' n (floor $ sqrt $ fromIntegral n)
@@ -192,6 +203,15 @@ partitions n = 1 + sum [p' k (n-k) | k <-[1..floor ((fromIntegral n) /2)]]
 		| k == n = 1
 		| otherwise = p' (k+1) (n) + p' k (n-k)
 
+exp_by_sq a b
+	| b == 0 = 1
+	| b == 1 = a
+	| even b = exp_by_sq (a*a) (b-1)
+	| odd b = a*(exp_by_sq (a) (b-1))
+
+hyper_exp a b
+	| b == 1 = a
+	| otherwise = exp_by_sq a (hyper_exp a (b-1))
 
 --Problems--
 
@@ -261,8 +281,13 @@ problem_12 = head [tri_num x | x <- [1..], (num_divisors . tri_num) x > 500]
 problem_13 = head_n 10 a
 	where a = 0 -- Sum all the numbers on the site.
 
-{-837799 - Completed 29.4.2013-}
-problem_14 =  head (head [collatz x | x <- [999999,999998..1], (length (collatz x))  == maximum [length (collatz x) | x <- [1..999999]]])
+{-837799 - Completed 29.4.2013 - Revised 25.5.2013-}
+problem_14 = collatz_mem (10^6) (0,0)
+	where
+		collatz_mem n (m,x)
+			| n == 1 = x
+			| (length . collatz) n <= m = collatz_mem (n-1) (((length . collatz) n),n)
+			| (length . collatz) n > m = collatz_mem (n-1) (m,x)
 
 {-137846528820 - Completed 17.5.2013 - Learned about binomial coefficients for solving lattice paths.-}
 problem_15 = 40 `nCr` 20 
@@ -368,6 +393,9 @@ problem_55 = length [n | n <- [1..9999], is_lychrel n]
 {-972 - Completed 10.5.2013-}
 problem_56 = maximum $ [(sum . int_to_list) (a^b) | a <- [1..99], b <- [1..99]]
 
+{-49 - Completed 25.5.2013 -}
+problem_63 = length [x^n | x <- [1..100], n <- [1..100], (length . show) (x^n) == n]
+
 {-510510 - Completed 16.5.2013 - Learned Euler Totient (phi(n)).-}
 problem_69 =  last $ sortBy (compare `on` snd) [(n, (fromIntegral n) / (fromIntegral . euler_totient) n) | n <- [2..1000000]]
 
@@ -431,24 +459,65 @@ problem_142 = head [x+y+z | x <- [1..1000], y <- [1..(x-1)], z <- [1..(y-1)], is
 	where
 		is_valid x y z = foldl (&&) True (map is_square [(x+y),(x-y),(x+z),(x-z),(y+z),(y-z)])
 
-problem_145 = length [(n, rev n) | n <- [1..10^9], is_reversable $! show (rev n)] - 5
+problem_145 = [(n, rev n) | n <- [1..10^9], let l = int_to_list n in (even . head) l && (odd . last) l && is_valid ((show . rev) n) n]
 	where
-		is_reversable (n:ns)
-			| even (digitToInt n) = False
-			| null ns && odd (digitToInt n) = True
-			| otherwise = is_reversable ns
-		rev n = n + (read $ reverse $ show n) :: Integer
+		rev n 
+			| n `mod` 10 == 0 = 2
+			| otherwise = n + (read . reverse . show) n :: Integer
+		is_valid (n:ns) x
+			| null ns && (odd . digitToInt) n = True
+			| (odd . digitToInt) n = is_valid ns x
+			| (even . digitToInt) n = False
 
-problem_211 = sum [n | n <- [1..64000000], is_valid n]
+problem_179 = [(n,num_divisors n) | n <- [1..10^7]]
+
+problem_188 = last_n 8 (hyper_exp 1777 1855)
+
+problem_206 = [n | n <- [1020304050607080900..1929394959697989990], is_valid (show n) 0]
 	where
-		is_valid :: Integral a => a -> Bool
-		is_valid n = is_square $ sum (map (^2) (divisors n))
+		find_x x
+			| is_valid (show (x^2)) 0 = x
+			| otherwise = find_x (x+1)
+		is_valid (n:ns) c
+			| null (n:ns) = True
+			| c == 0 && n == '1' = is_valid ns (c+1)
+			| c == 2 && n == '2' = is_valid ns (c+1)
+			| c == 4 && n == '3' = is_valid ns (c+1)
+			| c == 6 && n == '4' = is_valid ns (c+1)
+			| c == 8 && n == '5' = is_valid ns (c+1)
+			| c == 10 && n == '6' = is_valid ns (c+1)
+			| c == 12 && n == '7' = is_valid ns (c+1)
+			| c == 14 && n == '8' = is_valid ns (c+1)
+			| c == 16 && n == '9' = is_valid ns (c+1)
+			| c == 18 && n == '0' = is_valid ns (c+1)
+			| odd c = is_valid ns (c+1)
+			| otherwise = False
 
-problem_216 = length $ intersect primes [n | n <- [1..50000000]]
 
-
+problem_216 = [2*n^2-1 | n <- [2..50000000], is_prime (n*n^2-1)]
 
 {-1.002322108633 (Paper/Pencil)- Completed 11.5.2013 - Learned how to bisection search by hand.-}
 problem_235 = bisection_search f (0-600000000000) (1,1.5) 0.000000000001
 	where
 		f r = sum [(900-3*k)*r**(k-1) | k <- [1..5000]] 
+
+problem_243 = head nums
+	where
+		nums = [n+1 | n <- [94744, 2*94744..], (euler_totient (n+1))%n < 15499%94744]
+
+problem_277 = nums -- [(n, mod_col (n,"")) | n <- nums]
+	where
+		nums = [n | n <- [10^15-1,10^15-2..1], is_valid n 0]
+		is_valid n c
+			| c == 30 = True
+			| c `elem` [0,4,10,22,26,27] && ((4*n+2)`div`3) `mod` 3 == 1 = is_valid ((4*n+2)`div`3) (c+1)
+			| c `elem` [1,2,3,8,9,11,12,15,17,20,21,23,24,28] && (n`div`3) `mod` 3 == 0 = is_valid (n`div`3) (c+1)
+			| c `elem` [5,6,7,13,14,16,18,19,25,29] && ((2*n-1)`div`3) `mod` 3 == 2 = is_valid ((2*n-1)`div`3) (c+1)
+			| otherwise = False
+
+mod_col (n, str)
+	| n == 1004064 = "DdDddUUdDDDdUDUUUdDdUUDDDUdDD"
+	| n == 1 = str
+	| n `mod` 3 == 0 = mod_col (n`div`3, str ++ "D")
+	| n `mod` 3 == 1 = mod_col ((4*n + 2)`div`3, str ++ "U")
+	| n `mod` 3 == 2 = mod_col ((2*n -1)`div`3, str ++ "d")
