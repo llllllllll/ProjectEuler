@@ -6,6 +6,7 @@ import Data.Function
 import Data.Array
 import Data.Ratio
 import Numeric
+import Data.Maybe
 
 
 --Lists--
@@ -19,7 +20,7 @@ primes = 2: 3: sieve (tail primes) [5,7..]
 
 {-A list of all divisors of n-}
 divisors :: Integral a => a -> [a]
-divisors n = [x | x <- takeWhile (<=ceiling ((fromIntegral n)/2)) [1..], n `mod` x == 0]
+divisors n = 1:(concat [[x,n`div`x] | x <- [2..floor (sqrt (fromIntegral (n)))], n `mod` x == 0] \\ (if is_square n then [floor (sqrt (fromIntegral n))] else []))
 
 {-A list of all divisors of n in reverse order-}
 r_divisors :: Integral a => a -> [a]
@@ -110,7 +111,7 @@ is_decreasing n = is_decreasing' (head (show n)) (tail (show n))
 
 {-Returns if n is pandigital with bounds a..b-}
 is_pandigitalr (a,b) n = (nub . sort . int_to_list) n == [a..b]
-is_pandigital (a,b) n = is_pandigital' [a..b] (int_to_list n) []
+is_pandigital (a,b) n = (length . int_to_list) n == b && is_pandigital' [a..b] (int_to_list n) []
 	where
 		is_pandigital' ab (n:ns) vals
 			| n `elem` ab && not (n `elem` vals) && null ns = True
@@ -120,7 +121,8 @@ is_pandigital (a,b) n = is_pandigital' [a..b] (int_to_list n) []
 {-Returns the first d digits of n-}
 head_n d n = list_to_int $ take d (int_to_list n)
 {-Returns the last d digits of n-}
-last_n d n = reverse $ take d $ (reverse . show) n
+last_n d n = read $ reverse $ take d $ (reverse . show) n :: Integer
+
 
 {-Number of combinations of n choose r-}
 n `nCr` r = factorial n / (factorial r * factorial (n-r))
@@ -213,6 +215,27 @@ hyper_exp a b
 	| b == 1 = a
 	| otherwise = exp_by_sq a (hyper_exp a (b-1))
 
+
+roman_numerals = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC"),(50,"L"),(40,"XL"),(10,"X"),(9,"IX"),(5,"V"),(4,"IV"),(1,"I")]
+to_roman 0 = "N"
+to_roman x = to_roman' x
+	where
+		to_roman' x 
+		  | x == 0 = ""
+		  | x > 0 = b ++ to_roman' (x - a)
+		      where (a, b) = head $ filter ((<= x) . fst) roman_numerals
+
+from_roman str = if is_increasing $ map c str then sum $ map c str else 0
+	where
+		c n
+			| n == 'M' = 1000
+			| n == 'D' = 500
+			| n == 'C' = 100
+			| n == 'L' = 50
+			| n == 'X' = 10
+			| n == 'V' = 5
+			| n == 'I' = 1
+			| otherwise = 0
 --Problems--
 
 {-233168 - Completed 29.4.2013-}
@@ -273,9 +296,10 @@ problem_11 = maximum [maximum [horizontal r n | r <- [0..19], n <- [0..15]], max
 			listArray (0,19) [20, 73, 35, 29, 78, 31, 90, 01, 74, 31, 49, 71, 48, 86, 81, 16, 23, 57, 05, 54],
 			listArray (0,19) [01, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52, 01, 89, 19, 67, 48]]
 
-problem_12 = head [tri_num x | x <- [1..], (num_divisors . tri_num) x > 500]
+{-76576500 - Completed 26.5.12 -}
+problem_12 = head [x | x <- tri_nums, num_divisors x > 500]
 	where
-		tri_num ns = sum [1..ns]
+		tri_nums = map (\x -> sum [1..x]) [1..]
 
 {-5537376230 - Completed 15.5.2013-}
 problem_13 = head_n 10 a
@@ -357,8 +381,9 @@ problem_41 = [n | n <- primes, is_pandigitalr (1,(length . show) n) n]
 {-162 - Completed 23.5.2013 -}
 problem_42 = do
 	file <- readFile "words.txt"
-	let words = split_on (==',') file
-	let	char_pos c = (fromEnum c) - (fromEnum 'A') + 1
+	let 
+		words = split_on (==',') file
+		char_pos c = (fromEnum c) - (fromEnum 'A') + 1
 		is_tri str = is_tri_num $ sum $ map (char_pos) str
 		tri_nums = [fromIntegral (n*(n+1) `div` 2) | n <- [1..]]
 		is_tri_num n = n == head (dropWhile (<n) tri_nums)
@@ -392,6 +417,14 @@ problem_55 = length [n | n <- [1..9999], is_lychrel n]
 
 {-972 - Completed 10.5.2013-}
 problem_56 = maximum $ [(sum . int_to_list) (a^b) | a <- [1..99], b <- [1..99]]
+
+{-107359 - Completed 26.5.2013 - Most fun of any problem I have done -}
+problem_59 = do
+	file <- readFile "cipher1.txt"
+	let ascii = map (read) (split_on (==',') (filter (/='\n') file))
+	--print $ filter (\(a,b) -> "world" `isInfixOf` b) [(str, map (chr) (zipWith (xor) (map ord (cycle str)) ascii)) | str <- [[a,b,c] | a <- ['a'..'z'], b <- ['a'..'z'], c <- ['a'..'z']]]
+	print $ sum $ zipWith (xor) (map ord (cycle "god")) ascii
+
 
 {-49 - Completed 25.5.2013 -}
 problem_63 = length [x^n | x <- [1..100], n <- [1..100], (length . show) (x^n) == n]
@@ -427,6 +460,15 @@ problem_74 = length [f_chain n| n <- [1..999999], is_valid n]
 			| n `elem` ns = length ns
 			| otherwise = f_chain' ((sum . map factorial) (int_to_list n)) (n:ns)
 
+{-problem_89 = do
+	file <- readFile "roman.txt"
+	let 
+		start = length $ concat $ lines file
+		nums = lines file
+		fixed = map to_roman [from_roman str | str <- nums]
+	print $ start-}
+
+
 {-8581146 - Completed 22.5.2013 - Learned about forcing strictness -}
 problem_92 = length $ [n | n <- [1..100000], sq_chain n]
 	where
@@ -435,17 +477,27 @@ problem_92 = length $ [n | n <- [1..100000], sq_chain n]
 			| n == 89 = True
 			| otherwise = sq_chain $! (sum (map (^2) (int_to_list n)))
 
+problem_95 = last $ sortBy (compare `on` (length . snd)) [(n, a_chain n [n]) | n<- [1..10^6]]
+	where
+		sum_divisors = map (sum . divisors) [1..]
+		a_chain n ns
+			| n == head ns && length ns > 1 = ns
+			| n `elem` tail ns && length ns > 1 = []
+			| otherwise = a_chain (sum_divisors!!n) (n:ns)
+
 {-8739992577 - Completed 8.5.2013-}
 problem_97 = last_n 10 $ 28433*2^(7830457)+1
 
 {-709 - Completed 22.5.2013 - Learned how to work with IO -}
 problem_99 = do
 	file <- readFile "base_exp.txt"
-	putStrLn "Add 1 to index to get answer\nFormat: (index, value)"
-	return $ maximumBy (compare `on` snd) $ map (\(l, a, b) -> (l, (read b)*log (read a)) ) [(str `elemIndex` (lines file), head (split_on (==',') str), (last (split_on (==',') str))) | str <- lines file]
+	putStrLn "Format: (index, log (value))"
+	return $ (\(a,b) -> (fmap (+1) a,b)) $ maximumBy (compare `on` snd) $ map (\(l, a, b) -> (l, (read b)*log (read a)) ) [(str `elemIndex` (lines file), head (split_on (==',') str), (last (split_on (==',') str))) | str <- lines file]
 
 
-problem_104 = head $ filter (\x -> is_pandigitalr (1,9) (head_n 9 x) && is_pandigitalr (1,9) (last_n 9 x)) (map (fib) [1..])
+problem_104 = [n | n <- [1..], is_valid (fib n)]
+	where
+		is_valid n = is_pandigital (1,9) (head_n 9 n) && is_pandigital (1,9) (last_n 9 n)
 
 {-1587000 - Completed 22.5.2013 -}
 problem_112 = p 21780 19602
@@ -459,7 +511,8 @@ problem_142 = head [x+y+z | x <- [1..1000], y <- [1..(x-1)], z <- [1..(y-1)], is
 	where
 		is_valid x y z = foldl (&&) True (map is_square [(x+y),(x-y),(x+z),(x-z),(y+z),(y-z)])
 
-problem_145 = [(n, rev n) | n <- [1..10^9], let l = int_to_list n in (even . head) l && (odd . last) l && is_valid ((show . rev) n) n]
+{-608720 - Completed 26.5.2013 - Horrible solution must fix -}
+problem_145 = 2* length [(n, rev n) | n <- [1..10^9], let l = int_to_list n in (even . head) l && (odd . last) l && is_valid ((show . rev) n) n]
 	where
 		rev n 
 			| n `mod` 10 == 0 = 2
