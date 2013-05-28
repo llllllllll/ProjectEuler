@@ -225,7 +225,7 @@ to_roman x = to_roman' x
 		  | x > 0 = b ++ to_roman' (x - a)
 		      where (a, b) = head $ filter ((<= x) . fst) roman_numerals
 
-from_roman str = if is_increasing $ map c str then sum $ map c str else 0
+from_roman str = sum $ map c str
 	where
 		c n
 			| n == 'M' = 1000
@@ -335,6 +335,16 @@ problem_22 = sum $ map (\n -> raw_score n * pos_mod n) names
 		char_pos c = (fromEnum c) - (fromEnum 'A') + 1
 		pos_mod n = length (takeWhile (/=n) names) + 1
 
+problem_23 = takeWhile (<28123) [a+b | a <- abundants, b <- takeWhile (<a) abundants]
+	where
+		is_abundant n = is_abundant' n (divisors n) 0
+			where
+				is_abundant' n (h:t) sum
+					| sum > n = True
+					| null t && sum+h > n = True
+					| null t && sum+h <= n = False
+					| otherwise = is_abundant' n t (h+sum)
+		abundants = [n | n <- [1..], is_abundant n]
 
 {-2783915460 - Completed 5.5.2013-}
 problem_24 =  (sort . permutations) ['0'..'9'] !! 999999
@@ -422,9 +432,8 @@ problem_56 = maximum $ [(sum . int_to_list) (a^b) | a <- [1..99], b <- [1..99]]
 problem_59 = do
 	file <- readFile "cipher1.txt"
 	let ascii = map (read) (split_on (==',') (filter (/='\n') file))
-	--print $ filter (\(a,b) -> "world" `isInfixOf` b) [(str, map (chr) (zipWith (xor) (map ord (cycle str)) ascii)) | str <- [[a,b,c] | a <- ['a'..'z'], b <- ['a'..'z'], c <- ['a'..'z']]]
+	--print $ filter (\(a,b) -> "there" `isInfixOf` b) [(str, map (chr) (zipWith (xor) (map ord (cycle str)) ascii)) | str <- [[a,b,c] | a <- ['a'..'z'], b <- ['a'..'z'], c <- ['a'..'z']]]
 	print $ sum $ zipWith (xor) (map ord (cycle "god")) ascii
-
 
 {-49 - Completed 25.5.2013 -}
 problem_63 = length [x^n | x <- [1..100], n <- [1..100], (length . show) (x^n) == n]
@@ -494,7 +503,6 @@ problem_99 = do
 	putStrLn "Format: (index, log (value))"
 	return $ (\(a,b) -> (fmap (+1) a,b)) $ maximumBy (compare `on` snd) $ map (\(l, a, b) -> (l, (read b)*log (read a)) ) [(str `elemIndex` (lines file), head (split_on (==',') str), (last (split_on (==',') str))) | str <- lines file]
 
-
 problem_104 = [n | n <- [1..], is_valid (fib n)]
 	where
 		is_valid n = is_pandigital (1,9) (head_n 9 n) && is_pandigital (1,9) (last_n 9 n)
@@ -558,9 +566,9 @@ problem_243 = head nums
 	where
 		nums = [n+1 | n <- [94744, 2*94744..], (euler_totient (n+1))%n < 15499%94744]
 
-problem_277 = nums -- [(n, mod_col (n,"")) | n <- nums]
+problem_277 = nums -- [(n, mod_col (n,"")) | n <- nums, "UDDDUdddDDUDDddDdDddDDUDDdUUDd" `isPrefixOf` (mod_col (n, "")]
 	where
-		nums = [n | n <- [10^15-1,10^15-2..1], is_valid n 0]
+		nums = head [n | n <- [10000..], is_valid n 0]
 		is_valid n c
 			| c == 30 = True
 			| c `elem` [0,4,10,22,26,27] && ((4*n+2)`div`3) `mod` 3 == 1 = is_valid ((4*n+2)`div`3) (c+1)
@@ -569,7 +577,6 @@ problem_277 = nums -- [(n, mod_col (n,"")) | n <- nums]
 			| otherwise = False
 
 mod_col (n, str)
-	| n == 1004064 = "DdDddUUdDDDdUDUUUdDdUUDDDUdDD"
 	| n == 1 = str
 	| n `mod` 3 == 0 = mod_col (n`div`3, str ++ "D")
 	| n `mod` 3 == 1 = mod_col ((4*n + 2)`div`3, str ++ "U")
