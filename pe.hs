@@ -8,7 +8,6 @@ import Data.Ratio
 import Numeric
 import Data.Maybe
 
-
 --Lists--
 
 {-An infinite list of prime numbers-}
@@ -236,6 +235,21 @@ from_roman str = sum $ map c str
 			| n == 'V' = 5
 			| n == 'I' = 1
 			| otherwise = 0
+
+--Vectors--
+
+cross_prod a b = ((magnitude a * magnitude b * cos (angle_between a b)),(magnitude a * magnitude b * sin (angle_between a b)))
+
+dot_prod (a,b) (c,d) = a*c + b*d
+
+magnitude (a,b) = sqrt (a^2 + b^2)
+
+angle_between :: Floating a => (a,a) -> (a,a) -> a
+angle_between a b = asin (magnitude b / magnitude a)
+
+distance a b = sqrt ((fst a - fst b)^2 + (snd a - snd b)^2)
+
+
 --Problems--
 
 {-233168 - Completed 29.4.2013-}
@@ -406,6 +420,14 @@ problem_43 = sum $ (map (read) [x | x <- permutations ['0'..'9'], is_valid x] ::
 				&& read [x!!4,x!!5,x!!6] `mod` 7 == 0 && read [x!!5,x!!6,x!!7] `mod` 11 == 0 && read [x!!6,x!!7,x!!8] `mod` 13 == 0
 				&& read [x!!7,x!!8,x!!9] `mod` 17 == 0 
 
+
+{-1533776805 - Completed 29.5.2013 -}
+problem_45 = [h | h <- hex_nums, h == head (dropWhile (<h) pent_nums)]!!1
+	where
+		pent_nums = map (\n -> n*(3*n-1)`div`2) [2..]
+		hex_nums = map (\n -> n*(2*n-1)) [2..]
+
+
 {-134043 - Completed 17.5.2013-}
 problem_47 = head [n | n <- [1..], is_valid n]
 	where
@@ -503,6 +525,13 @@ problem_99 = do
 	putStrLn "Format: (index, log (value))"
 	return $ (\(a,b) -> (fmap (+1) a,b)) $ maximumBy (compare `on` snd) $ map (\(l, a, b) -> (l, (read b)*log (read a)) ) [(str `elemIndex` (lines file), head (split_on (==',') str), (last (split_on (==',') str))) | str <- lines file]
 
+problem_102 = do
+	file <- readFile "triangles.txt"
+	let
+		triangles = [(\xs -> ((read (xs!!0)::Double,read (xs!!1)::Double),(read (xs!!2)::Double,read (xs!!3)::Double),(read (xs!!4)::Double,read (xs!!5)::Double))) $ split_on (==',') str | str <- lines file]
+		origin = (0,0)
+	print $ length $ filter contains_origin triangles
+
 problem_104 = [n | n <- [1..], is_valid (fib n)]
 	where
 		is_valid n = is_pandigital (1,9) (head_n 9 n) && is_pandigital (1,9) (last_n 9 n)
@@ -530,7 +559,11 @@ problem_145 = 2* length [(n, rev n) | n <- [1..10^9], let l = int_to_list n in (
 			| (odd . digitToInt) n = is_valid ns x
 			| (even . digitToInt) n = False
 
-problem_179 = [(n,num_divisors n) | n <- [1..10^7]]
+problem_171 = [n | n <- [1..10^20-1], is_square (f n)]
+	where
+		f n = sum $ map (^2) (int_to_list n)
+
+problem_179 = [n | n <- [1..10^7-1], num_divisors n == num_divisors (n+1)]
 
 problem_188 = last_n 8 (hyper_exp 1777 1855)
 
@@ -565,6 +598,7 @@ problem_235 = bisection_search f (0-600000000000) (1,1.5) 0.000000000001
 problem_243 = head nums
 	where
 		nums = [n+1 | n <- [94744, 2*94744..], (euler_totient (n+1))%n < 15499%94744]
+
 
 problem_277 = nums -- [(n, mod_col (n,"")) | n <- nums, "UDDDUdddDDUDDddDdDddDDUDDdUUDd" `isPrefixOf` (mod_col (n, "")]
 	where
