@@ -1,4 +1,4 @@
-module ProjectEuler where 
+module Main where 
 import Data.List
 import Data.Bits
 import Data.Char
@@ -7,6 +7,7 @@ import Data.Array
 import Data.Ratio
 import Numeric
 import Data.Maybe
+import System.CPUTime
 
 --Lists--
 
@@ -31,6 +32,7 @@ prime_factors n = factor primes n
     factor ps@(p:pt) n | p*p > n      = [n]               
                        | rem n p == 0 = p : factor ps (quot n p) 
                        | otherwise    =     factor pt n
+
 prime_factors_mult = map encode . group . prime_factors
     where encode xs = (head xs, length xs)
 
@@ -47,7 +49,11 @@ fib = ((map f [0..])!!)
 	where
 		f 0 = 0
 		f 1 = 1
-		f n = fib (n-1) + fib (n-2)
+		f n = fib (n-2) + fib (n-1)
+
+slow_fib 0 = 0
+slow_fib 1 = 1
+slow_fib n = slow_fib (n-2) + slow_fib (n-1)
 
 {-Collatz Sequence starting at n-}
 collatz_mem = ((map c [0..])!!)
@@ -61,7 +67,6 @@ collatz 1 = []
 collatz n
 	| even n = n:collatz (n`div`2)
 	| odd n = n:collatz (n*3+1)
-
 
 --Functions--
 
@@ -80,7 +85,6 @@ is_prime n = is_prime' n (floor $ sqrt $ fromIntegral n)
 			| n == i*(n `div` i) = False
 			| otherwise = is_prime' n (i-1)
 	
-
 {-convert an Integral to a list of its digits. eg: int_to_list 123 = [1,2,3]-}
 int_to_list n = map digitToInt $ show n
 
@@ -90,8 +94,8 @@ list_to_int ns = read $ concatMap show ns :: Integer
 {-Returns a Bool whether a number is neither increasing or decreasing-}
 is_bouncy n = not (is_increasing n || is_decreasing n)
 
-{-Returns a Bool as to whether a number is increasing. eg: is_increasing 12344 = True, is_increasing 44321 = False-}
-is_increasing n = is_increasing' (head (show n)) (tail (show n))
+{-Returns a Bool as to whether a number is decreasing. eg: is_decreasing 12344 = False, is_decreasing 44321 = True-}
+is_decreasing n = is_increasing' (head (show n)) (tail (show n))
 	where
 		is_increasing' n (x:xs)
 			| null (x:xs) = False
@@ -99,8 +103,8 @@ is_increasing n = is_increasing' (head (show n)) (tail (show n))
 			| x <= n = is_increasing' x xs
 			| otherwise = False
 
-{-Returns a Bool as to whether a number is decreasing. eg: is_decreasing 12344 = False, is_decreasing 44321 = True-}
-is_decreasing n = is_decreasing' (head (show n)) (tail (show n))
+{-Returns a Bool as to whether a number is increasing. eg: is_increasing 12344 = True, is_increasing 44321 = False-}
+is_increasing n = is_decreasing' (head (show n)) (tail (show n))
 	where
 		is_decreasing' n (x:xs)
 			| null (x:xs) = False
@@ -121,7 +125,6 @@ is_pandigital (a,b) n = (length . int_to_list) n == b && is_pandigital' [a..b] (
 head_n d n = list_to_int $ take d (int_to_list n)
 {-Returns the last d digits of n-}
 last_n d n = read $ reverse $ take d $ (reverse . show) n :: Integer
-
 
 {-Number of combinations of n choose r-}
 n `nCr` r = factorial n / (factorial r * factorial (n-r))
@@ -207,13 +210,12 @@ partitions n = 1 + sum [p' k (n-k) | k <-[1..floor ((fromIntegral n) /2)]]
 exp_by_sq a b
 	| b == 0 = 1
 	| b == 1 = a
-	| even b = exp_by_sq (a*a) (b-1)
+	| even b = exp_by_sq (a*a) (b`div`2)
 	| odd b = a*(exp_by_sq (a) (b-1))
 
 hyper_exp a b
 	| b == 1 = a
 	| otherwise = exp_by_sq a (hyper_exp a (b-1))
-
 
 roman_numerals = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC"),(50,"L"),(40,"XL"),(10,"X"),(9,"IX"),(5,"V"),(4,"IV"),(1,"I")]
 to_roman 0 = "N"
@@ -249,12 +251,11 @@ angle_between a b = asin (magnitude b / magnitude a)
 
 distance a b = sqrt ((fst a - fst b)^2 + (snd a - snd b)^2)
 
-
 --Problems--
 
 {-233168 - Completed 29.4.2013-}
 problem_1 = sum [x | x <- [1..999], x `mod` 3 == 0 || x `mod` 5 == 0]
-problem_1' = (sum . nub) $ union [3,6..999] [5,10..995]
+problem_1' = sum $ union [3,6..999] [5,10..995]
 
 {-4613732 - Completed 29.4.2013 - Learned list comprehensions-}
 problem_2 = sum [x | x <- takeWhile (<4000000) (map fib [2..]), even x]
@@ -330,6 +331,8 @@ problem_14 = collatz_mem (10^6) (0,0)
 {-137846528820 - Completed 17.5.2013 - Learned about binomial coefficients for solving lattice paths.-}
 problem_15 = 40 `nCr` 20 
 
+{-1366 - Completed 2.6.2013 -}
+problem_16 = sum $ int_to_list (2^1000)
 
 {-648 - Completed 11.5.2013,-}
 problem_20 = (sum . int_to_list) $ factorial 100
@@ -340,7 +343,6 @@ problem_21 = sum [a | a <- [1..9999], is_amicable a]
 		is_amicable :: Integral a => a -> Bool
 		is_amicable a = (sum . divisors) ((sum . divisors) a) == a && a /= (sum . divisors) a
 
-
 {-871198282 - Completed 5.5.2013 - Baby's first lambda-}
 problem_22 = sum $ map (\n -> raw_score n * pos_mod n) names
 	where
@@ -349,16 +351,7 @@ problem_22 = sum $ map (\n -> raw_score n * pos_mod n) names
 		char_pos c = (fromEnum c) - (fromEnum 'A') + 1
 		pos_mod n = length (takeWhile (/=n) names) + 1
 
-problem_23 = takeWhile (<28123) [a+b | a <- abundants, b <- takeWhile (<a) abundants]
-	where
-		is_abundant n = is_abundant' n (divisors n) 0
-			where
-				is_abundant' n (h:t) sum
-					| sum > n = True
-					| null t && sum+h > n = True
-					| null t && sum+h <= n = False
-					| otherwise = is_abundant' n t (h+sum)
-		abundants = [n | n <- [1..], is_abundant n]
+problem_23 = 0
 
 {-2783915460 - Completed 5.5.2013-}
 problem_24 =  (sort . permutations) ['0'..'9'] !! 999999
@@ -391,7 +384,7 @@ problem_35 = length [n | n <- takeWhile (<1000000) primes, is_valid n]
 		circulate ns = init (zipWith (++) (tails ns) (inits ns))
 		is_valid n = all (is_prime . list_to_int) $ circulate (int_to_list n)
 
-{- 840 - Completed 24.5.2013 -}
+{-840 - Completed 24.5.2013 -}
 problem_39 = round $ head $ last $ sortBy (compare `on` length) $ group $ sort [let c = sqrt (a^2 + b^2) in a+b+c | a <- [1..998], b <- [1..a], let c = sqrt (a^2 + b^2) in is_int c && (a+b+c) <= 1000 && (a^2 + b^2) == c^2]
 
 {-210 - Completed 15.5.2013 - Leaned about Champernowne's Constant.-}
@@ -420,6 +413,9 @@ problem_43 = sum $ (map (read) [x | x <- permutations ['0'..'9'], is_valid x] ::
 				&& read [x!!4,x!!5,x!!6] `mod` 7 == 0 && read [x!!5,x!!6,x!!7] `mod` 11 == 0 && read [x!!6,x!!7,x!!8] `mod` 13 == 0
 				&& read [x!!7,x!!8,x!!9] `mod` 17 == 0 
 
+problem_44 = pent_num 10
+	where
+		pent_num = ((map (\n -> n*(3*n-1)`div`2) [1..])!!)
 
 {-1533776805 - Completed 29.5.2013 -}
 problem_45 = [h | h <- hex_nums, h == head (dropWhile (<h) pent_nums)]!!1
@@ -427,6 +423,11 @@ problem_45 = [h | h <- hex_nums, h == head (dropWhile (<h) pent_nums)]!!1
 		pent_nums = map (\n -> n*(3*n-1)`div`2) [2..]
 		hex_nums = map (\n -> n*(2*n-1)) [2..]
 
+{-5777 - Completed 2.6.2013 -}
+problem_46 = (fst . head) [(n,[(a,b)| a <- takeWhile (<=n) primes, b <- takeWhile (<=(n-a)`div`2) squares, a+2*b == n]) | n <- odd_composites, length [(a,b)| a <- takeWhile (<=n) primes, b <- takeWhile (<=(n-a)`div`2) squares, a+2*b == n] == 0 && (not . is_prime) n]
+	where
+		squares = map (^2) [1..]
+		odd_composites = [n | n <- [3,5..]]
 
 {-134043 - Completed 17.5.2013-}
 problem_47 = head [n | n <- [1..], is_valid n]
@@ -491,6 +492,9 @@ problem_74 = length [f_chain n| n <- [1..999999], is_valid n]
 			| n `elem` ns = length ns
 			| otherwise = f_chain' ((sum . map factorial) (int_to_list n)) (n:ns)
 
+{-73162890 - (Paper/Pencl) Completed 2.6.2013 -}
+problem_79 = error "Not Completed In Haskell"
+
 {-problem_89 = do
 	file <- readFile "roman.txt"
 	let 
@@ -498,7 +502,6 @@ problem_74 = length [f_chain n| n <- [1..999999], is_valid n]
 		nums = lines file
 		fixed = map to_roman [from_roman str | str <- nums]
 	print $ start-}
-
 
 {-8581146 - Completed 22.5.2013 - Learned about forcing strictness -}
 problem_92 = length $ [n | n <- [1..100000], sq_chain n]
@@ -525,16 +528,16 @@ problem_99 = do
 	putStrLn "Format: (index, log (value))"
 	return $ (\(a,b) -> (fmap (+1) a,b)) $ maximumBy (compare `on` snd) $ map (\(l, a, b) -> (l, (read b)*log (read a)) ) [(str `elemIndex` (lines file), head (split_on (==',') str), (last (split_on (==',') str))) | str <- lines file]
 
-problem_102 = do
+{-problem_102 = do
 	file <- readFile "triangles.txt"
 	let
 		triangles = [(\xs -> ((read (xs!!0)::Double,read (xs!!1)::Double),(read (xs!!2)::Double,read (xs!!3)::Double),(read (xs!!4)::Double,read (xs!!5)::Double))) $ split_on (==',') str | str <- lines file]
 		origin = (0,0)
-	print $ length $ filter contains_origin triangles
+	print $ length $ filter contains_origin triangles -}
 
-problem_104 = [n | n <- [1..], is_valid (fib n)]
+problem_108 = map (length . solutions) [1..]
 	where
-		is_valid n = is_pandigital (1,9) (head_n 9 n) && is_pandigital (1,9) (last_n 9 n)
+		solutions n = [(x,y) | x <- [1..500], y <- [1..x], 1%x+1%y==1%n]
 
 {-1587000 - Completed 22.5.2013 -}
 problem_112 = p 21780 19602
@@ -543,6 +546,11 @@ problem_112 = p 21780 19602
 			| a%n >= (99%100) = n
 			| is_bouncy n = p (n+1) (a+1)
 			| otherwise = p (n+1) a
+
+{-21417 - Completed 2.6.2013 -}
+problem_124 = fst $ (sortBy (compare `on` snd) [(n, rad n) | n <- [1..100000]])!!9999
+	where
+		rad n = product $ nub $ prime_factors n
 
 problem_142 = head [x+y+z | x <- [1..1000], y <- [1..(x-1)], z <- [1..(y-1)], is_valid x y z]
 	where
@@ -567,6 +575,10 @@ problem_179 = [n | n <- [1..10^7-1], num_divisors n == num_divisors (n+1)]
 
 problem_188 = last_n 8 (hyper_exp 1777 1855)
 
+problem_197 = f (10^12)
+	where
+		f n = (floor (2**(30.403243784-n^2))) * (10^^(-9))
+
 problem_206 = [n | n <- [1020304050607080900..1929394959697989990], is_valid (show n) 0]
 	where
 		find_x x
@@ -587,7 +599,6 @@ problem_206 = [n | n <- [1020304050607080900..1929394959697989990], is_valid (sh
 			| odd c = is_valid ns (c+1)
 			| otherwise = False
 
-
 problem_216 = [2*n^2-1 | n <- [2..50000000], is_prime (n*n^2-1)]
 
 {-1.002322108633 (Paper/Pencil)- Completed 11.5.2013 - Learned how to bisection search by hand.-}
@@ -598,7 +609,6 @@ problem_235 = bisection_search f (0-600000000000) (1,1.5) 0.000000000001
 problem_243 = head nums
 	where
 		nums = [n+1 | n <- [94744, 2*94744..], (euler_totient (n+1))%n < 15499%94744]
-
 
 problem_277 = nums -- [(n, mod_col (n,"")) | n <- nums, "UDDDUdddDDUDDddDdDddDDUDDdUUDd" `isPrefixOf` (mod_col (n, "")]
 	where
