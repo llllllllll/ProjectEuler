@@ -55,14 +55,14 @@ slow_fib 0 = 0
 slow_fib 1 = 1
 slow_fib n = slow_fib (n-2) + slow_fib (n-1)
 
-{-Collatz Sequence starting at n-}
+{-Memoized Collatz Sequence starting at n-}
 collatz_mem = ((map c [0..])!!)
 	where
 		c 1 = [1]
 		c n
 			| even n = n:collatz_mem (n`div`2)
 			| odd n = n:collatz_mem (n*3+1)
-
+{-Collatz Sequence starting at n-}
 collatz 1 = []
 collatz n
 	| even n = n:collatz (n`div`2)
@@ -179,44 +179,53 @@ binary_search' n arr a b
 	| otherwise = 0-1
 	where c = floor (fromIntegral (a + b) / 2)
 
+{-Simple Bisection search taking a function f, a value to search for n, a tuple indicating range, and an epsilon or accuracy level-}
 bisection_search f n (a,b) eps
 	| f a > f b = b_search_dec f n (a,b) eps
 	|otherwise = b_search_inc f n (a,b) eps
+{-Bisection search for a function that is increasing over the range (a,b)-}
 b_search_inc f n (a,b) eps
 	| f c == n || (b-a)/2 < eps = c
 	| f c > n = b_search_inc f n (a, c) eps
 	| otherwise = b_search_inc f n (c, b) eps
 	where c = (a+b)/2.0
+{-Bisection search for a function that is decreasing over the range (a,b)-}
 b_search_dec f n (a,b) eps
 	| f c == n || (b-a)/2 < eps = c
 	| f c < n = b_search_dec f n (a, c) eps
 	| otherwise = b_search_dec f n (c, b) eps
 	where c = (a+b)/2.0
 
+{-The length of array arr-}
 a_length arr = (snd . bounds) arr - (fst . bounds) arr
 
+{-Splits a string into a list of strings at a given condition (wordsBy)-}
 split_on :: (Char -> Bool) -> String -> [String]
 split_on p s =  case dropWhile p s of
                       "" -> []
                       s' -> w : split_on p s''
                             where (w, s'') = break p s'
 
+{-The number of partitions in n-}
 partitions n = 1 + sum [p' k (n-k) | k <-[1..floor ((fromIntegral n) /2)]]
 	where p' k n
 		| k > n = 0
 		| k == n = 1
 		| otherwise = p' (k+1) (n) + p' k (n-k)
 
+{-Exponentiation by squares O(log b)-}
 exp_by_sq a b
 	| b == 0 = 1
 	| b == 1 = a
 	| even b = exp_by_sq (a*a) (b`div`2)
 	| odd b = a*(exp_by_sq (a) (b-1))
 
+{-Tetaration or power tower for a b-}
 hyper_exp a b
 	| b == 1 = a
 	| otherwise = exp_by_sq a (hyper_exp a (b-1))
 
+{-Converts a number into its most efficent roman numberal representation -}
 roman_numerals = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC"),(50,"L"),(40,"XL"),(10,"X"),(9,"IX"),(5,"V"),(4,"IV"),(1,"I")]
 to_roman 0 = "N"
 to_roman x = to_roman' x
@@ -226,6 +235,7 @@ to_roman x = to_roman' x
 		  | x > 0 = b ++ to_roman' (x - a)
 		      where (a, b) = head $ filter ((<= x) . fst) roman_numerals
 
+{-NOT WORKING -Parses a string representation of roman numerals into there arabic numeral equivalent -}
 from_roman str = sum $ map c str
 	where
 		c n
@@ -240,15 +250,20 @@ from_roman str = sum $ map c str
 
 --Vectors--
 
+{- a X b -}
 cross_prod a b = ((magnitude a * magnitude b * cos (angle_between a b)),(magnitude a * magnitude b * sin (angle_between a b)))
 
+{- a * b -}
 dot_prod (a,b) (c,d) = a*c + b*d
 
+{- ||<a,b>|| -}
 magnitude (a,b) = sqrt (a^2 + b^2)
 
+{-The angle in radians between vector a and vector b-}
 angle_between :: Floating a => (a,a) -> (a,a) -> a
 angle_between a b = asin (magnitude b / magnitude a)
 
+{-Euclidian distance between point a and point b-}
 distance a b = sqrt ((fst a - fst b)^2 + (snd a - snd b)^2)
 
 --Problems--
@@ -575,7 +590,7 @@ problem_179 = [n | n <- [1..10^7-1], num_divisors n == num_divisors (n+1)]
 
 problem_188 = last_n 8 (hyper_exp 1777 1855)
 
-problem_197 = f (10^12)
+problem_197 = 
 	where
 		f n = (floor (2**(30.403243784-n^2))) * (10^^(-9))
 
