@@ -143,7 +143,10 @@ is_int :: RealFrac a => a -> Bool
 is_int n = (round $ 10^(fromIntegral 7)*(n-(fromIntegral $ round n))) == 0
 
 {-Returns True if n is a perfect square-}
-is_square n = is_int (fromIntegral (n) **(0.5))
+is_square n = ((round (fromIntegral (n)**(0.5))) ^2 == n)
+
+{-Returns True if n is a perfect cube-}
+is_cube n = (round (fromIntegral (n)**(1/3))) ^3 == n
 
 {-The size of the list of numbers coprime to n-}
 euler_totient m = product [(p - 1) * p ^ (c - 1) | (p, c) <- prime_factors_mult m]
@@ -202,18 +205,19 @@ a_length arr = (snd . bounds) arr - (fst . bounds) arr
 {-Splits a string into a list of strings at a given condition (wordsBy)-}
 split_on :: (Char -> Bool) -> String -> [String]
 split_on p s =  case dropWhile p s of
-                      "" -> []
-                      s' -> w : split_on p s''
-                            where (w, s'') = break p s'
+    				"" -> []
+    				s' -> w : split_on p s''
+    					where (w, s'') = break p s'
 
 {-The number of partitions in n-}
-partitions n = 1 + sum [p' k (n-k) | k <-[1..floor ((fromIntegral n) /2)]]
-	where p' k n
-		| k > n = 0
-		| k == n = 1
-		| otherwise = p' (k+1) (n) + p' k (n-k)
+partitions n = c n n
+    where
+        c 0 _ = 1
+        c _ 0 = 1
+        c n m = sum $ map (\x -> l!!(n-x)!!min (n-x) x) [1..m]
+        l = [[c n m | m <- [0..n]] | n<-[0..]]
 
-{-Exponentiation by squares O(log b)-}
+{-Exponentiation by squares in O(log b)-}
 exp_by_sq a b
 	| b == 0 = 1
 	| b == 1 = a
@@ -473,6 +477,11 @@ problem_59 = do
 	--print $ filter (\(a,b) -> "there" `isInfixOf` b) [(str, map (chr) (zipWith (xor) (map ord (cycle str)) ascii)) | str <- [[a,b,c] | a <- ['a'..'z'], b <- ['a'..'z'], c <- ['a'..'z']]]
 	print $ sum $ zipWith (xor) (map ord (cycle "god")) ascii
 
+problem_62 = [n | n <- cubes, is_valid n]
+	where
+		cubes = map (^3) [1..]
+		is_valid n = 3 == (length . nub) [m | m <- permutations (int_to_list n), head m /= 0 && is_cube (list_to_int m)]
+
 {-49 - Completed 25.5.2013 -}
 problem_63 = length [x^n | x <- [1..100], n <- [1..100], (length . show) (x^n) == n]
 
@@ -506,6 +515,9 @@ problem_74 = length [f_chain n| n <- [1..999999], is_valid n]
 		f_chain' n ns
 			| n `elem` ns = length ns
 			| otherwise = f_chain' ((sum . map factorial) (int_to_list n)) (n:ns)
+
+{-190569291 - Completed 4.6.2013 -}
+problem_76 = partitions 100 - 1
 
 {-73162890 - (Paper/Pencl) Completed 2.6.2013 -}
 problem_79 = error "Not Completed In Haskell"
@@ -589,10 +601,6 @@ problem_171 = [n | n <- [1..10^20-1], is_square (f n)]
 problem_179 = [n | n <- [1..10^7-1], num_divisors n == num_divisors (n+1)]
 
 problem_188 = last_n 8 (hyper_exp 1777 1855)
-
-problem_197 = 
-	where
-		f n = (floor (2**(30.403243784-n^2))) * (10^^(-9))
 
 problem_206 = [n | n <- [1020304050607080900..1929394959697989990], is_valid (show n) 0]
 	where
