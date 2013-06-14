@@ -11,6 +11,11 @@ import Control.Monad
 import Control.Applicative
 import System.CPUTime
 
+
+main = do
+	file <- readFile "pe.hs"
+	putStr file
+
 --Lists--
 
 {-An infinite list of prime numbers-}
@@ -22,11 +27,11 @@ primes = 2: 3: sieve (tail primes) [5,7..]
 
 {-A list of all divisors of n-}
 divisors :: Integral a => a -> [a]
-divisors n = 1:(concat [[x,n`div`x] | x <- [2..floor (sqrt (fromIntegral (n)))], n `mod` x == 0] \\ (if is_square n then [floor (sqrt (fromIntegral n))] else []))
+divisors n = 1:(concat [[x,n`div`x] | x <- [2..floor (sqrt (fromIntegral (n)))], n `rem` x == 0] \\ (if is_square n then [floor (sqrt (fromIntegral n))] else []))
 
 {-A list of all divisors of n in reverse order-}
 r_divisors :: Integral a => a -> [a]
-r_divisors n = [x | x <- [n, n-1..1], n `mod` x == 0]
+r_divisors n = [x | x <- [n, n-1..1], n `rem` x == 0]
 
 {-The primes factors of n-}
 prime_factors n = factor primes n
@@ -145,7 +150,10 @@ is_int :: RealFrac a => a -> Bool
 is_int n = (round $ 10^(fromIntegral 7)*(n-(fromIntegral $ round n))) == 0
 
 {-Returns True if n is a perfect square-}
-is_square n = is_int (fromIntegral (n) **(0.5))
+is_square n = ((round (fromIntegral (n)**(0.5))) ^2 == n)
+
+{-Returns True if n is a perfect cube-}
+is_cube n = (round (fromIntegral (n)**(1/3))) ^3 == n
 
 {-The size of the list of numbers coprime to n-}
 euler_totient m = product [(p - 1) * p ^ (c - 1) | (p, c) <- prime_factors_mult m]
@@ -204,18 +212,19 @@ a_length arr = (snd . bounds) arr - (fst . bounds) arr
 {-Splits a string into a list of strings at a given condition (wordsBy)-}
 split_on :: (Char -> Bool) -> String -> [String]
 split_on p s =  case dropWhile p s of
-                      "" -> []
-                      s' -> w : split_on p s''
-                            where (w, s'') = break p s'
+    				"" -> []
+    				s' -> w : split_on p s''
+    					where (w, s'') = break p s'
 
 {-The number of partitions in n-}
-partitions n = 1 + sum [p' k (n-k) | k <-[1..floor ((fromIntegral n) /2)]]
-	where p' k n
-		| k > n = 0
-		| k == n = 1
-		| otherwise = p' (k+1) (n) + p' k (n-k)
+partitions n = c n n
+    where
+        c 0 _ = 1
+        c _ 0 = 1
+        c n m = sum $ map (\x -> l!!(n-x)!!min (n-x) x) [1..m]
+        l = [[c n m | m <- [0..n]] | n<-[0..]]
 
-{-Exponentiation by squares O(log b)-}
+{-Exponentiation by squares in O(log b)-}
 exp_by_sq a b
 	| b == 0 = 1
 	| b == 1 = a
@@ -271,7 +280,7 @@ distance a b = sqrt ((fst a - fst b)^2 + (snd a - snd b)^2)
 --Problems--
 
 {-233168 - Completed 29.4.2013-}
-problem_1 = sum [x | x <- [1..999], x `mod` 3 == 0 || x `mod` 5 == 0]
+problem_1 = sum [x | x <- [1..999], x `rem` 3 == 0 || x `rem` 5 == 0]
 problem_1' = sum $ union [3,6..999] [5,10..995]
 
 {-4613732 - Completed 29.4.2013 - Learned list comprehensions-}
@@ -374,7 +383,14 @@ problem_22 = sum $ map (\n -> raw_score n * pos_mod n) names
 		char_pos c = (fromEnum c) - (fromEnum 'A') + 1
 		pos_mod n = length (takeWhile (/=n) names) + 1
 
-problem_23 = 0
+problem_23 = [a + b | a <- abundants, b <- takeWhile (<=a) abundants, a + b < 28123]
+	where
+		abundants = filter is_abundant [12..28111]
+		is_abundant n = is_abundant' n (divisors n) 0
+		is_abundant' k (n:ns) c
+			| null ns = n + c > k
+			| n + c > k = True
+			| otherwise = is_abundant' k ns (c+n)
 
 {-2783915460 - Completed 5.5.2013-}
 problem_24 =  (sort . permutations) ['0'..'9'] !! 999999
@@ -392,7 +408,7 @@ problem_32 = [(a,b,a*b)| a <- [2..10000], b <- [1..a-1], is_valid a b]
 		is_valid a b = is_pandigital (1,9) (list_to_int [a*b,a,b])
 
 {-100 - Completed 23.5.2013 -}
-problem_33 = denominator $ product [a%b | a <- [10..99], b <- [10..99],  a%b < 1 && a /= b && a `mod` 10 /= 0 && b `mod` 10 /= 0 && is_valid a b]
+problem_33 = denominator $ product [a%b | a <- [10..99], b <- [10..99],  a%b < 1 && a /= b && a `rem` 10 /= 0 && b `rem` 10 /= 0 && is_valid a b]
 	where
 		is_valid a b = (not . null) (intersect (int_to_list a) (int_to_list b)) && let s = head (intersect (int_to_list a) (int_to_list b)) in (list_to_int (delete s (int_to_list a))) % (list_to_int (delete s (int_to_list b))) == a%b
 
@@ -435,9 +451,9 @@ problem_42 = do
 {-16695334890 - Completed 21.5.2013 -}
 problem_43 = sum $ (map (read) [x | x <- permutations ['0'..'9'], is_valid x] :: [Integer])
 	where
-		is_valid x = (even . read) [x!!1,x!!2,x!!3] && read [x!!2,x!!3,x!!4] `mod` 3 == 0 && read [x!!3,x!!4,x!!5] `mod` 5 == 0
-				&& read [x!!4,x!!5,x!!6] `mod` 7 == 0 && read [x!!5,x!!6,x!!7] `mod` 11 == 0 && read [x!!6,x!!7,x!!8] `mod` 13 == 0
-				&& read [x!!7,x!!8,x!!9] `mod` 17 == 0 
+		is_valid x = (even . read) [x!!1,x!!2,x!!3] && read [x!!2,x!!3,x!!4] `rem` 3 == 0 && read [x!!3,x!!4,x!!5] `rem` 5 == 0
+				&& read [x!!4,x!!5,x!!6] `rem` 7 == 0 && read [x!!5,x!!6,x!!7] `rem` 11 == 0 && read [x!!6,x!!7,x!!8] `rem` 13 == 0
+				&& read [x!!7,x!!8,x!!9] `rem` 17 == 0 
 
 problem_44 = [pent_num a - pent_num b | a<-[1..5000], b<-[1..a], is_pent (pent_num a - pent_num b) && is_pent (pent_num a + pent_num b)]
 	where
@@ -482,8 +498,13 @@ problem_56 = maximum $ [(sum . int_to_list) (a^b) | a <- [1..99], b <- [1..99]]
 problem_59 = do
 	file <- readFile "cipher1.txt"
 	let ascii = map (read) (split_on (==',') (filter (/='\n') file))
-	--print $ filter (\(a,b) -> "there" `isInfixOf` b) [(str, map (chr) (zipWith (xor) (map ord (cycle str)) ascii)) | str <- [[a,b,c] | a <- ['a'..'z'], b <- ['a'..'z'], c <- ['a'..'z']]]
+	--print $ filter (\(a,b) -> " the " `isInfixOf` b) [(str, map (chr) (zipWith (xor) (map ord (cycle str)) ascii)) | str <- [[a,b,c] | a <- ['a'..'z'], b <- ['a'..'z'], c <- ['a'..'z']]]
 	print $ sum $ zipWith (xor) (map ord (cycle "god")) ascii
+
+problem_62 = [n | n <- cubes, is_valid n]
+	where
+		cubes = map (^3) [1..]
+		is_valid n = 3 == (length . nub) [m | m <- permutations (int_to_list n), head m /= 0 && is_cube (list_to_int m)]
 
 {-49 - Completed 25.5.2013 -}
 problem_63 = length [x^n | x <- [1..100], n <- [1..100], (length . show) (x^n) == n]
@@ -518,6 +539,9 @@ problem_74 = length [f_chain n| n <- [1..999999], is_valid n]
 		f_chain' n ns
 			| n `elem` ns = length ns
 			| otherwise = f_chain' ((sum . map factorial) (int_to_list n)) (n:ns)
+
+{-190569291 - Completed 4.6.2013 -}
+problem_76 = partitions 100 - 1
 
 {-73162890 - (Paper/Pencl) Completed 2.6.2013 -}
 problem_79 = error "Not Completed In Haskell"
@@ -587,7 +611,7 @@ problem_142 = head [x+y+z | x <- [1..1000], y <- [1..(x-1)], z <- [1..(y-1)], is
 problem_145 = 2* length [(n, rev n) | n <- [1..10^9], let l = int_to_list n in (even . head) l && (odd . last) l && is_valid ((show . rev) n) n]
 	where
 		rev n 
-			| n `mod` 10 == 0 = 2
+			| n `rem` 10 == 0 = 2
 			| otherwise = n + (read . reverse . show) n :: Integer
 		is_valid (n:ns) x
 			| null ns && (odd . digitToInt) n = True
@@ -638,13 +662,13 @@ problem_277 = nums -- [(n, mod_col (n,"")) | n <- nums, "UDDDUdddDDUDDddDdDddDDU
 		nums = head [n | n <- [10000..], is_valid n 0]
 		is_valid n c
 			| c == 30 = True
-			| c `elem` [0,4,10,22,26,27] && ((4*n+2)`div`3) `mod` 3 == 1 = is_valid ((4*n+2)`div`3) (c+1)
-			| c `elem` [1,2,3,8,9,11,12,15,17,20,21,23,24,28] && (n`div`3) `mod` 3 == 0 = is_valid (n`div`3) (c+1)
-			| c `elem` [5,6,7,13,14,16,18,19,25,29] && ((2*n-1)`div`3) `mod` 3 == 2 = is_valid ((2*n-1)`div`3) (c+1)
+			| c `elem` [0,4,10,22,26,27] && ((4*n+2)`div`3) `rem` 3 == 1 = is_valid ((4*n+2)`div`3) (c+1)
+			| c `elem` [1,2,3,8,9,11,12,15,17,20,21,23,24,28] && (n`div`3) `rem` 3 == 0 = is_valid (n`div`3) (c+1)
+			| c `elem` [5,6,7,13,14,16,18,19,25,29] && ((2*n-1)`div`3) `rem` 3 == 2 = is_valid ((2*n-1)`div`3) (c+1)
 			| otherwise = False
 
 mod_col (n, str)
 	| n == 1 = str
-	| n `mod` 3 == 0 = mod_col (n`div`3, str ++ "D")
-	| n `mod` 3 == 1 = mod_col ((4*n + 2)`div`3, str ++ "U")
-	| n `mod` 3 == 2 = mod_col ((2*n -1)`div`3, str ++ "d")
+	| n `rem` 3 == 0 = mod_col (n`div`3, str ++ "D")
+	| n `rem` 3 == 1 = mod_col ((4*n + 2)`div`3, str ++ "U")
+	| n `rem` 3 == 2 = mod_col ((2*n -1)`div`3, str ++ "d")
