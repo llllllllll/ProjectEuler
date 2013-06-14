@@ -7,6 +7,8 @@ import Data.Array
 import Data.Ratio
 import Numeric
 import Data.Maybe
+import Control.Monad
+import Control.Applicative
 import System.CPUTime
 
 --Lists--
@@ -290,9 +292,15 @@ problem_6 = (sum [1..100]) ^ 2 - sum (map (^2) [1..100])
 {-104743 - Completed 29.4.2013 - Learned how to index a list-}
 problem_7 = primes !! 10001
 
-problem_8 = error "Not Completed In Haskell"
-
-problem_9 = error "Not Completed In Haskell"
+{-40824 - Completed 3.6.2013 -}
+problem_8 = do
+	file <- readFile "problem_8.txt"
+	let
+		num = listArray (1,1000) (map digitToInt $ filter (/='\n') file)
+		ps = [num!n * num!(n+1) * num!(n+2) * num!(n+3) * num!(n+4) | n <- [1..995]]
+	print $ maximum ps
+{-31875000 - Completed 3.6.2013 -}
+problem_9 = [let c = sqrt (a^2 + b^2) in a*b*c | a <- [3..1000], b <- [1..a-1], a+b+(sqrt (a^2 + b^2)) == 1000]
 
 {-142913828922 - Completed 29.4.2013-}
 problem_10 = sum $ takeWhile (<2000000) primes
@@ -379,7 +387,7 @@ problem_29 = length $ nub [a^b | a <- [2..100], b <- [2..100]]
 {-443839 - Completed 5.5.2013-}
 problem_30 = sum [s | s <- [2..999999], ((sum . map (^5)) (int_to_list s)) == s]
 
-problem_32 = sum $ nub [a*b | a <- [1..10000], b <- [1..a], is_valid a b]
+problem_32 = [(a,b,a*b)| a <- [2..10000], b <- [1..a-1], is_valid a b]
 	where
 		is_valid a b = is_pandigital (1,9) (list_to_int [a*b,a,b])
 
@@ -398,6 +406,9 @@ problem_35 = length [n | n <- takeWhile (<1000000) primes, is_valid n]
 	where
 		circulate ns = init (zipWith (++) (tails ns) (inits ns))
 		is_valid n = all (is_prime . list_to_int) $ circulate (int_to_list n)
+
+{-872187 - Completed 3.6.2013 - Learned ShowS.-}
+problem_36 = sum [n | n <- [1..999999], show n == (reverse . show) n  && (showIntAtBase 2 intToDigit n) "" == reverse ((showIntAtBase 2 intToDigit n) "")]
 
 {-840 - Completed 24.5.2013 -}
 problem_39 = round $ head $ last $ sortBy (compare `on` length) $ group $ sort [let c = sqrt (a^2 + b^2) in a+b+c | a <- [1..998], b <- [1..a], let c = sqrt (a^2 + b^2) in is_int c && (a+b+c) <= 1000 && (a^2 + b^2) == c^2]
@@ -428,8 +439,9 @@ problem_43 = sum $ (map (read) [x | x <- permutations ['0'..'9'], is_valid x] ::
 				&& read [x!!4,x!!5,x!!6] `mod` 7 == 0 && read [x!!5,x!!6,x!!7] `mod` 11 == 0 && read [x!!6,x!!7,x!!8] `mod` 13 == 0
 				&& read [x!!7,x!!8,x!!9] `mod` 17 == 0 
 
-problem_44 = pent_num 10
+problem_44 = [pent_num a - pent_num b | a<-[1..5000], b<-[1..a], is_pent (pent_num a - pent_num b) && is_pent (pent_num a + pent_num b)]
 	where
+		is_pent n = is_int ((1/6)*(1-sqrt (fromIntegral (24*n+1)))) || is_int ((1/6)*(1+sqrt (fromIntegral (24*n+1))))
 		pent_num = ((map (\n -> n*(3*n-1)`div`2) [1..])!!)
 
 {-1533776805 - Completed 29.5.2013 -}
@@ -526,7 +538,7 @@ problem_92 = length $ [n | n <- [1..100000], sq_chain n]
 			| n == 89 = True
 			| otherwise = sq_chain $! (sum (map (^2) (int_to_list n)))
 
-problem_95 = last $ sortBy (compare `on` (length . snd)) [(n, a_chain n [n]) | n<- [1..10^6]]
+problem_95 = last $ sortBy (compare `on` (length . snd)) [(n, a_chain n [n]) | n <- [1..10^6]]
 	where
 		sum_divisors = map (sum . divisors) [1..]
 		a_chain n ns
@@ -541,7 +553,7 @@ problem_97 = last_n 10 $ 28433*2^(7830457)+1
 problem_99 = do
 	file <- readFile "base_exp.txt"
 	putStrLn "Format: (index, log (value))"
-	return $ (\(a,b) -> (fmap (+1) a,b)) $ maximumBy (compare `on` snd) $ map (\(l, a, b) -> (l, (read b)*log (read a)) ) [(str `elemIndex` (lines file), head (split_on (==',') str), (last (split_on (==',') str))) | str <- lines file]
+	return $ (\(a,b) -> ((+1) <$> a,b)) $ maximumBy (compare `on` snd) $ map (\(l, a, b) -> (l, (read b)*log (read a)) ) [(str `elemIndex` (lines file), head (split_on (==',') str), (last (split_on (==',') str))) | str <- lines file]
 
 {-problem_102 = do
 	file <- readFile "triangles.txt"
@@ -589,10 +601,6 @@ problem_171 = [n | n <- [1..10^20-1], is_square (f n)]
 problem_179 = [n | n <- [1..10^7-1], num_divisors n == num_divisors (n+1)]
 
 problem_188 = last_n 8 (hyper_exp 1777 1855)
-
-problem_197 = 
-	where
-		f n = (floor (2**(30.403243784-n^2))) * (10^^(-9))
 
 problem_206 = [n | n <- [1020304050607080900..1929394959697989990], is_valid (show n) 0]
 	where
