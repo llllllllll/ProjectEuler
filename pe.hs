@@ -22,7 +22,8 @@ main = do
 primes :: [Integer]
 primes = 2: 3: sieve (tail primes) [5,7..]
 	where 
-  		sieve (p:ps) xs = n ++ sieve ps [x | x <- ns, x `rem` p /= 0]  
+  		sieve (p:ps) xs = n ++ sieve ps [x | x <- ns, 
+                                                 x `rem` p /= 0]  
   			where (n,~(_:ns)) = span (< p*p) xs
 
 {-A list of all divisors of n-}
@@ -30,7 +31,8 @@ divisors :: Integral a => a -> [a]
 divisors n = 1:(concat 
                 [[x,n`div`x] | x <- [2..floor (sqrt (fromIntegral (n)))], 
                  n `rem` x == 0] \\ (if is_square n then 
-                                       [floor (sqrt (fromIntegral n))] else []))
+                                       [floor (sqrt (fromIntegral n))] 
+                                     else []))
 
 {-A list of all divisors of n in reverse order-}
 r_divisors :: Integral a => a -> [a]
@@ -98,8 +100,8 @@ is_prime n = is_prime' n (floor $ sqrt $ fromIntegral n)
 {-convert an Integral to a list of its digits. eg: int_to_list 123 = [1,2,3]-}
 int_to_list n = map digitToInt $ show n
 
-{-Inverse of int_to_list. Convert a list into an Integral where each element is 
-a digit. eg: list_to_int [1,2,3] = 123-}
+{-Inverse of int_to_list. Convert a list into an Integral where each element 
+                is a digit. eg: list_to_int [1,2,3] = 123-}
 list_to_int ns = read $ concatMap show ns :: Integer
 
 {-Returns a Bool whether a number is neither increasing or decreasing-}
@@ -115,7 +117,8 @@ is_decreasing n = is_increasing' (head (show n)) (tail (show n))
 			| x <= n = is_increasing' x xs
 			| otherwise = False
 
-{-Returns a Bool as to whether a number is increasing. eg: is_increasing 12344 = True, is_increasing 44321 = False-}
+{-Returns a Bool as to whether a number is increasing. 
+eg: is_increasing 12344 = True, is_increasing 44321 = False-}
 is_increasing n = is_decreasing' (head (show n)) (tail (show n))
 	where
 		is_decreasing' n (x:xs)
@@ -126,7 +129,7 @@ is_increasing n = is_decreasing' (head (show n)) (tail (show n))
 
 {-Returns if n is pandigital with bounds a..b-}
 is_pandigitalr (a,b) n = (nub . sort . int_to_list) n == [a..b]
-is_pandigital (a,b) n = (length . int_to_list) n == b && is_pandigital' [a..b] 
+is_pandigital (a,b) n = (length . int_to_list) n == b && is_pandigital' [a..b]
                         (int_to_list n) []
 	where
 		is_pandigital' ab (n:ns) vals
@@ -188,8 +191,8 @@ is_lychrel n = is_lychrel' n 0
 is_lychrel' n c
 	| (reverse . show) n == show n && c /= 0 = False
 	| c == 50 = True
-	| otherwise = is_lychrel' (list_to_int ((reverse . int_to_list) n) + n) 
-                      (c+1)
+	| otherwise = 
+          is_lychrel' (list_to_int ((reverse . int_to_list) + (c+1)
 
 {-A Binary Search for arrays-}
 binary_search n arr = binary_search' n arr 0 (a_length arr)
@@ -322,13 +325,14 @@ problem_7 = primes !! 10001
 problem_8 = do
 	file <- readFile "problem_8.txt"
 	let
-		num = listArray (1,1000) (map digitToInt $ filter (/='\n') file)
+		num = listArray (1,1000) (map digitToInt $ filter (/='\n') 
+                                          file)
 		ps = [num!n * num!(n+1) * num!(n+2) * num!(n+3) * num!(n+4) | 
                       n <- [1..995]]
 	print $ maximum ps
 
 {-31875000 - Completed 3.6.2013 -}
-problem_9 = [let c = sqrt (a^2 + b^2) in a*b*c | a <- [3..1000], b <- [1..a-1], 
+problem_9 = [let c = sqrt (a^2 + b^2) in a*b*c | a <- [3..1000], b <- [1..a-1,
              a+b+(sqrt (a^2 + b^2)) == 1000]
 
 {-142913828922 - Completed 29.4.2013-}
@@ -450,7 +454,8 @@ problem_21 = sum [a | a <- [1..9999], is_amicable a]
 {-871198282 - Completed 5.5.2013 - Baby's first lambda-}
 problem_22 = sum $ map (\n -> raw_score n * pos_mod n) names
 	where
-		names = [""] --Names.txt can be found on the website, I just ommited to clean it up.
+		names = [""] --Names.txt can be found on the website, 
+                             --I just ommited to clean it up.
 		raw_score n = (sum . map char_pos) n
 		char_pos c = (fromEnum c) - (fromEnum 'A') + 1
 		pos_mod n = length (takeWhile (/=n) names) + 1
