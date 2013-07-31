@@ -42,8 +42,8 @@ open_problem p = do
                                 ++ show p ++ ".hs &") 
                  >> appendFile "Problems/.incomplete" (show p)
     where
-        problem_template n = "-- NOT YET COMPLETED.\nmodule Problem_" ++ show n
-                             ++ "\n    ( problem_" ++ show n 
+        problem_template n = "-- NOT YET COMPLETED.\nmodule Problems.Problem_" 
+                             ++ show n ++ "\n    ( problem_" ++ show n 
                              ++ "\n    ) where\n\nproblem_" ++ show n 
                              ++ " = "
    
