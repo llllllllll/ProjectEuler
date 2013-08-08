@@ -10,6 +10,9 @@ import Control.Monad
 import Control.Applicative
 import Problem_Wrapper
 
+problem_wrapper :: FilePath                                                                 
+problem_wrapper = "/home/joejev/CompSci/ProjectEuler/src/Problem_Wrapper.hs"  
+
 main :: IO ()
 main = putStrLn "Project Euler Work by Joe Jevnik"
 
@@ -55,6 +58,7 @@ mark_complete p = do
     removeFile "Problems/.incomplete"
     appendFile "Problems/.incomplete" $ unlines ws'
     appendFile "Problems/.complete" $ '\n':show p
+    wrap_import p
 
 -- Marks problem_p as incomplete
 mark_incomplete :: Int -> IO ()
@@ -64,3 +68,23 @@ mark_incomplete p = do
     removeFile "Problems/.complete"
     appendFile "Problems/.complete" $ unlines cs'
     appendFile "Problems/.incomplete" $ '\n':show p
+    unwrap_import p
+
+-- Removes a problem from the Problem_Wrapper import list.
+unwrap_import :: Int -> IO ()
+unwrap_import p = do
+    ls <- lines <$> readFile problem_wrapper
+    let edits = unlines $ filter 
+                (\l -> "Problems.Problem_" ++ show p `notElem` words l) ls
+    removeFile problem_wrapper
+    appendFile problem_wrapper edits
+
+-- Adds a problem to the Problem_Wrapper list.
+wrap_import :: Int -> IO ()
+wrap_import p = do
+    ls <- fmap (break (=="    ) where") . lines) $ readFile problem_wrapper
+    let edits = (unlines . fst) ls ++ "    , module Problems.Problem_"
+                ++ show p ++ "\n" ++ (unlines . snd) ls
+                ++ "import Problems.Problem_" ++ show p
+    removeFile problem_wrapper
+    appendFile problem_wrapper edits
