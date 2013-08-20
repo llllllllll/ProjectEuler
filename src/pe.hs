@@ -1,4 +1,6 @@
+-- Joe Jevnik
 -- Date: 31.7.2013
+-- Utilities for working on Project Euler problems in Haskell.
 module Main where
 
 import System.IO
@@ -9,10 +11,14 @@ import Data.Maybe
 import Control.Monad
 import Control.Applicative
 import Problem_Wrapper
+import C_Problem_Wrapper
+import qualified C_Pe as C
 
+-- The file used to neatly wrap all problems to be imported by the Main module.
 problem_wrapper :: FilePath                                                                 
-problem_wrapper = "/home/joejev/CompSci/ProjectEuler/src/Problem_Wrapper.hs"  
+problem_wrapper = "/home/joejev/compsci/ProjectEuler/src/Problem_Wrapper.hs"
 
+-- Displays some basic information about my work.
 main :: IO ()
 main = putStrLn "Project Euler Work by Joe Jevnik"
 
@@ -36,20 +42,20 @@ open_problem p = do
     if s `elem` ["Complete","Incomplete"] 
     then (system $ "emacs Problems/Problem_" ++ show p ++ ".hs &") >> return ()
     else do
-        putStrLn "Problem has not been started, Would you like to start it (y/n)"
+        putStr "Problem has not been started, Would you like to start it (Y/n): "
         inp <- getLine
-        when (inp == "y") $ (system ("echo \"" ++ problem_template p 
-                                    ++ "\" > Problems/Problem_" 
-                                    ++ show p ++ ".hs")) 
-                 >> (system $ "emacs Problems/Problem_" 
-                                ++ show p ++ ".hs &") 
-                 >> appendFile "Problems/.incomplete" (show p)
+        unless (inp `elem` ["n","N"]) $ (system ("echo \"" ++ problem_template p 
+                                                 ++ "\" > Problems/Problem_" 
+                                                 ++ show p ++ ".hs")) 
+                   >> (system $ "emacs Problems/Problem_" 
+                                  ++ show p ++ ".hs &") 
+                   >> appendFile "Problems/.incomplete" (show p)
     where
         problem_template n = "-- NOT YET COMPLETED.\nmodule Problems.Problem_" 
                              ++ show n ++ "\n    ( problem_" ++ show n 
                              ++ "\n    ) where\n\nproblem_" ++ show n 
                              ++ " = "
-   
+              
 -- Marks problem_p as complete.
 mark_complete :: Int -> IO ()
 mark_complete p = do
@@ -70,15 +76,6 @@ mark_incomplete p = do
     appendFile "Problems/.incomplete" $ '\n':show p
     unwrap_import p
 
--- Removes a problem from the Problem_Wrapper import list.
-unwrap_import :: Int -> IO ()
-unwrap_import p = do
-    ls <- lines <$> readFile problem_wrapper
-    let edits = unlines $ filter 
-                (\l -> "Problems.Problem_" ++ show p `notElem` words l) ls
-    removeFile problem_wrapper
-    appendFile problem_wrapper edits
-
 -- Adds a problem to the Problem_Wrapper list.
 wrap_import :: Int -> IO ()
 wrap_import p = do
@@ -88,3 +85,13 @@ wrap_import p = do
                 ++ "import Problems.Problem_" ++ show p
     removeFile problem_wrapper
     appendFile problem_wrapper edits
+
+-- Removes a problem from the Problem_Wrapper import list.
+unwrap_import :: Int -> IO ()
+unwrap_import p = do
+    ls <- lines <$> readFile problem_wrapper
+    let edits = unlines $ filter 
+                (\l -> "Problems.Problem_" ++ show p `notElem` words l) ls
+    removeFile problem_wrapper
+    appendFile problem_wrapper edits
+

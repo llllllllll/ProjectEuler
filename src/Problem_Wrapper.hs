@@ -1,3 +1,6 @@
+-- Joe Jevnik
+-- Date: 31.7.2013
+-- A neat wrapper module for all my problems in Haskell.
 module Problem_Wrapper 
     ( module Problems.Problem_1
     , module Problems.Problem_2
