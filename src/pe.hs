@@ -50,6 +50,7 @@ open_problem p = do
                    >> (system $ "emacs Problems/Problem_" 
                                   ++ show p ++ ".hs &") 
                    >> appendFile "Problems/.incomplete" (show p)
+                   >> wrap_import p
     where
         problem_template n = "-- NOT YET COMPLETED.\nmodule Problems.Problem_" 
                              ++ show n ++ "\n    ( problem_" ++ show n 
@@ -64,7 +65,6 @@ mark_complete p = do
     removeFile "Problems/.incomplete"
     appendFile "Problems/.incomplete" $ unlines ws'
     appendFile "Problems/.complete" $ '\n':show p
-    wrap_import p
 
 -- Marks problem_p as incomplete
 mark_incomplete :: Int -> IO ()
@@ -74,7 +74,6 @@ mark_incomplete p = do
     removeFile "Problems/.complete"
     appendFile "Problems/.complete" $ unlines cs'
     appendFile "Problems/.incomplete" $ '\n':show p
-    unwrap_import p
 
 -- Adds a problem to the Problem_Wrapper list.
 wrap_import :: Int -> IO ()

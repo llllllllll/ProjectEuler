@@ -48,7 +48,8 @@ open_problem p = do
                                        ++ show p ++ ".c")) 
                    >> (system $ "emacs C_Problems/Problem_" 
                                   ++ show p ++ ".c &") 
-                   >> appendFile "C_Problems/.incomplete" (show p)
+                   >> appendFile "C_Problems/.incomplete" (show p) 
+                   >> wrap_import p
     where
         problem_template n = "// NOT YET COMPLETED.\n#include <stdlib.h>\n"
                              ++ "#include <iostream>\n\nint main(){\n    "
@@ -61,7 +62,6 @@ mark_complete p = do
     removeFile "C_Problems/.incomplete"
     appendFile "C_Problems/.incomplete" $ unlines ws'
     appendFile "C_Problems/.complete" $ '\n':show p
-    wrap_import p
 
 -- Marks problem_p as incomplete
 mark_incomplete :: Int -> IO ()
@@ -71,7 +71,6 @@ mark_incomplete p = do
     removeFile "C_Problems/.complete"
     appendFile "C_Problems/.complete" $ unlines cs'
     appendFile "C_Problems/.incomplete" $ '\n':show p
-    unwrap_import p
 
 -- Adds a problem to the C_Problem_Wrapper list.
 wrap_import :: Int -> IO ()
