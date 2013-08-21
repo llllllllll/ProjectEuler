@@ -20,7 +20,7 @@ eval p = do
     readProcess "C_Problems/temp_proc" [] [] >>= putStrLn
     removeFile "C_Problems/temp_proc"
 
--- Automatically generated functions.
+-- Automatically generated functions.x
 
 c_problem_1 :: IO ()
 c_problem_1 = eval 1

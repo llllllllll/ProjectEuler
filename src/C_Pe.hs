@@ -28,31 +28,33 @@ check_status p = do
     cs <- lines <$> readFile "C_Problems/.complete"
     ws <- lines <$> readFile "C_Problems/.incomplete"
     return $ check_status' p cs ws
-    where
-        check_status' p cs ws
-            | show p `elem` cs = "Complete"
-            | show p `elem` ws = "Incomplete"
-            | otherwise = "Not yet started"
+  where
+      check_status' p cs ws
+          | show p `elem` cs = "Complete"
+          | show p `elem` ws = "Incomplete"
+          | otherwise = "Not yet started"
 
 -- open_problem but for c/c++ problems.
 open_problem :: Int -> IO ()
 open_problem p = do
     s <- check_status p
     if s `elem` ["Complete","Incomplete"] 
-    then (system $ "emacs C_Problems/Problem_" ++ show p ++ ".c &") >> return ()
-    else do
-        putStr "Problem has not been started, Would you like to start it (Y/n)"
-        inp <- getLine
-        unless (inp `elem` ["n","N"]) $ (system ("echo \"" ++ problem_template p 
-                                       ++ "\" > C_Problems/Problem_" 
-                                       ++ show p ++ ".c")) 
-                   >> (system $ "emacs C_Problems/Problem_" 
-                                  ++ show p ++ ".c &") 
-                   >> appendFile "C_Problems/.incomplete" (show p) 
-                   >> wrap_import p
-    where
-        problem_template n = "// NOT YET COMPLETED.\n#include <stdlib.h>\n"
-                             ++ "#include <iostream>\n\nint main(){\n    "
+      then (system $ "emacs C_Problems/Problem_" ++ show p ++ ".c &") 
+                 >> return ()
+      else do
+          putStr "Problem has not been started, Would you like to start it (Y/n)"
+          inp <- getLine
+          unless (inp `elem` ["n","N"]) 
+                     $ (system ("echo \"" ++ problem_template p 
+                                ++ "\" > C_Problems/Problem_" 
+                                ++ show p ++ ".c")) 
+                     >> (system $ "emacs C_Problems/Problem_" 
+                                    ++ show p ++ ".c &") 
+                     >> appendFile "C_Problems/.incomplete" (show p) 
+                     >> wrap_import p
+  where
+      problem_template n = "// NOT YET COMPLETED.\n#include <stdlib.h>\n"
+                           ++ "#include <iostream>\n\nint main(){\n    "
 
 -- Marks problem_p as complete.
 mark_complete :: Int -> IO ()

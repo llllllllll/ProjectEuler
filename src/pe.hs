@@ -28,11 +28,11 @@ check_status p = do
     cs <- lines <$> readFile "Problems/.complete"
     ws <- lines <$> readFile "Problems/.incomplete"
     return $ check_status' p cs ws
-    where
-        check_status' p cs ws
-            | show p `elem` cs = "Complete"
-            | show p `elem` ws = "Incomplete"
-            | otherwise = "Not yet started"
+  where
+      check_status' p cs ws
+          | show p `elem` cs = "Complete"
+          | show p `elem` ws = "Incomplete"
+          | otherwise = "Not yet started"
 
 -- Opens the given problem in a new emacs window or
 -- starts a new problem with the template if it does not exist.
@@ -40,22 +40,22 @@ open_problem :: Int -> IO ()
 open_problem p = do
     s <- check_status p
     if s `elem` ["Complete","Incomplete"] 
-    then (system $ "emacs Problems/Problem_" ++ show p ++ ".hs &") >> return ()
-    else do
-        putStr "Problem has not been started, Would you like to start it (Y/n): "
-        inp <- getLine
-        unless (inp `elem` ["n","N"]) $ (system ("echo \"" ++ problem_template p 
-                                                 ++ "\" > Problems/Problem_" 
-                                                 ++ show p ++ ".hs")) 
-                   >> (system $ "emacs Problems/Problem_" 
-                                  ++ show p ++ ".hs &") 
-                   >> appendFile "Problems/.incomplete" (show p)
-                   >> wrap_import p
-    where
-        problem_template n = "-- NOT YET COMPLETED.\nmodule Problems.Problem_" 
-                             ++ show n ++ "\n    ( problem_" ++ show n 
-                             ++ "\n    ) where\n\nproblem_" ++ show n 
-                             ++ " = "
+      then (system $ "emacs Problems/Problem_" ++ show p ++ ".hs &") >> return ()
+      else do
+          putStr "Problem has not been started, Would you like to start it (Y/n): "
+          inp <- getLine
+          unless (inp `elem` ["n","N"]) $ (system ("echo \"" ++ problem_template p 
+                                                   ++ "\" > Problems/Problem_" 
+                                                   ++ show p ++ ".hs")) 
+                     >> (system $ "emacs Problems/Problem_" 
+                                    ++ show p ++ ".hs &") 
+                     >> appendFile "Problems/.incomplete" (show p)
+                     >> wrap_import p
+  where
+      problem_template n = "-- NOT YET COMPLETED.\nmodule Problems.Problem_" 
+                           ++ show n ++ "\n    ( problem_" ++ show n 
+                           ++ "\n    ) where\n\nproblem_" ++ show n 
+                           ++ " = "
               
 -- Marks problem_p as complete.
 mark_complete :: Int -> IO ()
