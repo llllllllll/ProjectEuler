@@ -57,12 +57,10 @@ module Problem_Wrapper
     , module Problems.Problem_74
     , module Problems.Problem_76
     , module Problems.Problem_79
-    , module Problems.Problem_89
     , module Problems.Problem_92
     , module Problems.Problem_95
     , module Problems.Problem_97
     , module Problems.Problem_99
-    , module Problems.Problem_102
     , module Problems.Problem_108
     , module Problems.Problem_112
     , module Problems.Problem_124
@@ -129,12 +127,10 @@ import Problems.Problem_73
 import Problems.Problem_74
 import Problems.Problem_76
 import Problems.Problem_79
-import Problems.Problem_89
 import Problems.Problem_92
 import Problems.Problem_95
 import Problems.Problem_97
 import Problems.Problem_99
-import Problems.Problem_102
 import Problems.Problem_108
 import Problems.Problem_112
 import Problems.Problem_124
