@@ -36,6 +36,7 @@ check_status p = do
 
 -- Opens the given problem in a new emacs window or
 -- starts a new problem with the template if it does not exist.
+-- WARNING: Sending interupts to ghci will close the window.
 open_problem :: Int -> IO ()
 open_problem p = do
     s <- check_status p
@@ -50,7 +51,7 @@ open_problem p = do
                      >> (system $ "emacs Problems/Problem_" 
                                     ++ show p ++ ".hs &") 
                      >> appendFile "Problems/.incomplete" (show p)
-                     >> wrap_import p
+                     >> wrap_import p >> mark_incomplete p
   where
       problem_template n = "-- NOT YET COMPLETED.\nmodule Problems.Problem_" 
                            ++ show n ++ "\n    ( problem_" ++ show n 
@@ -61,19 +62,32 @@ open_problem p = do
 mark_complete :: Int -> IO ()
 mark_complete p = do
     ws <- lines <$> readFile "Problems/.incomplete"
-    let ws' = filter (/=show p) ws
-    removeFile "Problems/.incomplete"
-    appendFile "Problems/.incomplete" $ unlines ws'
-    appendFile "Problems/.complete" $ '\n':show p
+    unless (show p `elem` ws) $ do
+                      let ws' = filter (/=show p) ws
+                      removeFile "Problems/.incomplete"
+                      appendFile "Problems/.incomplete" $ unlines ws'
+                      appendFile "Problems/.complete" $ '\n':show p
 
 -- Marks problem_p as incomplete
 mark_incomplete :: Int -> IO ()
 mark_incomplete p = do
     cs <- lines <$> readFile "Problems/.complete"
+    unless (show p `elem` cs) $ do
+                        let cs' = filter (/=show p) cs
+                        removeFile "Problems/.complete"
+                        appendFile "Problems/.complete" $ unlines cs'
+                        appendFile "Problems/.incomplete" $ '\n':show p
+
+-- Marks a problem as not yet started.
+mark_not_started :: Int -> IO ()
+mark_not_started p = do
+    cs <- lines <$> readFile "Problems/.complete"
+    ws <- lines <$> readFile "Problems/.incomplete"
     let cs' = filter (/=show p) cs
-    removeFile "Problems/.complete"
+        ws' = filter (/=show p) ws
+    mapM_ removeFile ["Problems/.incomplete","Problems/.complete"]
     appendFile "Problems/.complete" $ unlines cs'
-    appendFile "Problems/.incomplete" $ '\n':show p
+    appendFile "Problems/.incomplete" $ unlines ws'
 
 -- Adds a problem to the Problem_Wrapper list.
 wrap_import :: Int -> IO ()
@@ -94,3 +108,20 @@ unwrap_import p = do
     removeFile problem_wrapper
     appendFile problem_wrapper edits
 
+-- Returns a list of problems that are completed.
+ls_complete :: IO [Int]
+ls_complete = (map read) . filter (/="") . lines 
+              <$> readFile "Problems/.complete"
+
+-- Returns a list of problems that are incomplete.
+ls_incomplete :: IO [Int]
+ls_incomplete = (map read) . filter (/="") . lines
+                <$> readFile "Problems/.incomplete"
+
+-- Returns the number of problems that are marked complete.
+count_complete :: IO Int
+count_complete = length <$> ls_complete
+
+-- Returns the number of problems that are marked incomplete.
+count_incomplete :: IO Int
+count_incomplete = length <$> ls_incomplete

@@ -7,6 +7,8 @@ module C_Problem_Wrapper
     , c_problem_3
     , c_problem_5
     , c_problem_15
+    , c_problem_6
+    , c_problem_4
     ) where
 
 import System.Process
@@ -20,7 +22,7 @@ eval p = do
     readProcess "C_Problems/temp_proc" [] [] >>= putStrLn
     removeFile "C_Problems/temp_proc"
 
--- Automatically generated functions.x
+-- Automatically generated functions.
 
 c_problem_1 :: IO ()
 c_problem_1 = eval 1
@@ -36,3 +38,9 @@ c_problem_5 = eval 5
 
 c_problem_15 :: IO ()
 c_problem_15 = eval 15
+
+c_problem_6 :: IO ()
+c_problem_6 = eval 6
+
+c_problem_4 :: IO ()
+c_problem_4 = eval 4
