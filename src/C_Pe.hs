@@ -60,13 +60,15 @@ open_problem p = do
                      >> wrap_import p >> mark_incomplete p
   where
       problem_template n = "// NOT YET COMPLETED.\n#include <stdlib.h>\n"
-                           ++ "#include <iostream>\n\nint main(){\n    \n}"
+                           ++ "#include <iostream>\ninclude <gmp.h>\n\n"
+                           ++ "int main(){\n    \n}"
 
 -- Marks problem_p as complete.
 mark_complete :: Int -> IO ()
 mark_complete p = do
+    cs <- lines <$> readFile "C_Problems/.complete"
     ws <- lines <$> readFile "C_Problems/.incomplete"
-    unless (show p `elem` ws) $ do
+    unless (show p `elem` cs) $ do
                       let ws' = filter (/=show p) ws
                       removeFile "C_Problems/.incomplete"
                       appendFile "C_Problems/.incomplete" $ unlines ws'
@@ -76,7 +78,8 @@ mark_complete p = do
 mark_incomplete :: Int -> IO ()
 mark_incomplete p = do
     cs <- lines <$> readFile "C_Problems/.complete"
-    unless (show p `elem` cs) $ do
+    ws <- lines <$> readFile "C_Problems/.incomplete"
+    unless (show p `elem` ws) $ do
                         let cs' = filter (/=show p) cs
                         removeFile "C_Problems/.complete"
                         appendFile "C_Problems/.complete" $ unlines cs'
@@ -115,12 +118,12 @@ unwrap_import p = do
 
 -- Returns a list of problems that are completed.
 ls_complete :: IO [Int]
-ls_complete = (map read) . filter (/="") . lines 
+ls_complete = sort . (map read) . filter (/="") . lines 
               <$> readFile "C_Problems/.complete"
 
 -- Returns a list of problems that are incomplete.
 ls_incomplete :: IO [Int]
-ls_incomplete = (map read) . filter (/="") . lines
+ls_incomplete = sort . (map read) . filter (/="") . lines
                 <$> readFile "C_Problems/.incomplete"
 
 -- Returns the number of problems that are marked complete.

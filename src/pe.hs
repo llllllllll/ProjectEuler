@@ -113,12 +113,12 @@ unwrap_import p = do
 
 -- Returns a list of problems that are completed.
 ls_complete :: IO [Int]
-ls_complete = (map read) . filter (/="") . lines 
+ls_complete = sort . (map read) . filter (/="") . lines 
               <$> readFile "Problems/.complete"
 
 -- Returns a list of problems that are incomplete.
 ls_incomplete :: IO [Int]
-ls_incomplete = (map read) . filter (/="") . lines
+ls_incomplete = sort . (map read) . filter (/="") . lines
                 <$> readFile "Problems/.incomplete"
 
 -- Returns the number of problems that are marked complete.

@@ -1,4 +1,4 @@
-module Utils.Constant 
+module Utils.Constant
     ( e
     , champernowne
     ) where

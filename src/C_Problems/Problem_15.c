@@ -21,5 +21,10 @@ void nCr(int n,int r){
     mpz_mul(den,den_1,den_2);
     mpz_cdiv_q(res,num,den);
     gmp_printf ("%Zd",res);
+    mpz_clear(res);
+    mpz_clear(num);
+    mpz_clear(den);
+    mpz_clear(den_1);
+    mpz_clear(den_2);
 }
      
