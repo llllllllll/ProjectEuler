@@ -25,12 +25,15 @@ module Utils.Misc
     , partitions
     , exp_by_sq
     , hyper_exp
+    , mod_exp
     , to_roman
     , from_roman
     ) where
 
 import Data.List
 import Data.Array
+import Data.Bits
+import Data.String.Utils
 import Utils.List
 import Utils.Prime
 
@@ -60,22 +63,22 @@ is_bouncy n = not (is_increasing n || is_decreasing n)
 -- Returns a Bool as to whether a number is decreasing. 
 -- eg: is_decreasing 12344 = False, is_decreasing 44321 = True.
 is_decreasing n = is_increasing' (head (show n)) (tail (show n))
-    where
-	is_increasing' n (x:xs)
-	    | null (x:xs) = False
-	    | null xs  && x <= n = True
-	    | x <= n = is_increasing' x xs
-	    | otherwise = False
+  where
+      is_increasing' n (x:xs)
+	  | null (x:xs) = False
+	  | null xs  && x <= n = True
+	  | x <= n = is_increasing' x xs
+	  | otherwise = False
 
 -- Returns a Bool as to whether a number is increasing. 
 -- eg: is_increasing 12344 = True, is_increasing 44321 = False.
 is_increasing n = is_decreasing' (head (show n)) (tail (show n))
-    where
-	is_decreasing' n (x:xs)
-	    | null (x:xs) = False
-	    | null xs && x >= n = True
-	    | x >= n = is_decreasing' x xs
-	    | otherwise = False
+  where
+      is_decreasing' n (x:xs)
+	  | null (x:xs) = False
+	  | null xs && x >= n = True
+	  | x >= n = is_decreasing' x xs
+	  | otherwise = False
 
 -- Returns if n is pandigital allowing repeats with bounds a..b.
 is_pandigitalr (a,b) n = (nub . sort . int_to_list) n == [a..b]
@@ -83,12 +86,12 @@ is_pandigitalr (a,b) n = (nub . sort . int_to_list) n == [a..b]
 -- Return if n is pandigital NOT allowing repeats with bounds a..b.
 is_pandigital (a,b) n = (length . int_to_list) n == b && is_pandigital' [a..b]
                         (int_to_list n) []
-    where
-	is_pandigital' ab (n:ns) vals
-	    | n `elem` ab && not (n `elem` vals) && null ns = True
-	    | n `elem` ab && not ( n `elem` vals) = is_pandigital'
+  where
+      is_pandigital' ab (n:ns) vals
+	  | n `elem` ab && not (n `elem` vals) && null ns = True
+	  | n `elem` ab && not ( n `elem` vals) = is_pandigital'
                                                     ab ns (n:vals)
-	    | otherwise = False
+	  | otherwise = False
 
 -- Returns the first d digits of n.
 head_n d n = list_to_int $ take d (int_to_list n)
@@ -121,11 +124,11 @@ euler_totient m = product
 -- Detirmines if a number is a lychrel number,
 -- a number that does not converge to a palindrome.
 is_lychrel n = is_lychrel' n 0
-    where
-        is_lychrel' n c
-            | (reverse . show) n == show n && c /= 0 = False
-            | c == 50 = True
-            | otherwise = 
+  where
+      is_lychrel' n c
+          | (reverse . show) n == show n && c /= 0 = False
+          | c == 50 = True
+          | otherwise = 
                 is_lychrel' (list_to_int ((reverse . int_to_list) n) + n) (c+1)
 
 -- A Binary Search for arrays
@@ -135,41 +138,41 @@ binary_search' n arr a b
     | arr ! c > n = binary_search' n arr a (c-1)
     | arr ! c < n = binary_search' n arr (c+1) b
     | otherwise = 0-1
-    where c = floor (fromIntegral (a + b) / 2)
+  where c = floor (fromIntegral (a + b) / 2)
 
 -- Simple Bisection search taking a function f, a value to search for n, 
 -- a tuple indicating range, and an epsilon or accuracy level.e
 bisection_search f n (a,b) eps
     | f a > f b = b_search_dec f n (a,b) eps
-    |otherwise = b_search_inc f n (a,b) eps
+    | otherwise = b_search_inc f n (a,b) eps
 
 -- Bisection search for a function that is increasing over the range (a,b).
 b_search_inc f n (a,b) eps
     | f c == n || (b - a) / 2 < eps = c
     | f c > n = b_search_inc f n (a,c) eps
     | otherwise = b_search_inc f n (c,b) eps
-    where c = (a + b) / 2.0
+  where c = (a + b) / 2.0
 
 -- Bisection search for a function that is decreasing over the range (a,b).
 b_search_dec f n (a,b) eps
     | f c == n || (b - a) / 2 < eps = c
     | f c < n = b_search_dec f n (a,c) eps
     | otherwise = b_search_dec f n (c,b) eps
-    where c = (a + b) / 2.0
+  where c = (a + b) / 2.0
 
 -- The length of array arr.
 a_length arr = (snd . bounds) arr - (fst . bounds) arr
 
 -- The number of partitions in n.
 partitions n = c n n
-    where
-        c 0 _ = 1
-        c _ 0 = 1
-        c n m = sum $ map (\x -> l!!(n-x)!!min (n-x) x) [1..m]
-        l = [[c n m | m <- [0..n]] | n<-[0..]]
-
+  where
+      c 0 _ = 1
+      c _ 0 = 1
+      c n m = sum $ map (\x -> l!!(n-x)!!min (n-x) x) [1..m]
+      l = [[c n m | m <- [0..n]] | n<-[0..]]
+                  
 -- Exponentiation by squares in O(log b).
-exp_by_sq :: Num a => a -> Int -> a
+exp_by_sq :: Num a => a -> Integer -> a
 exp_by_sq a b
     | b == 0 = 1
     | b == 1 = a
@@ -180,6 +183,14 @@ exp_by_sq a b
 hyper_exp a b
     | b == 1 = a
     | otherwise = exp_by_sq a (hyper_exp a (b-1))
+
+mod_exp :: (Integral a, Bits a) => a -> a -> a -> a
+mod_exp a b c = exp_mod' a b c 1
+  where 
+      exp_mod' a b c s
+          | b == 0    = s
+          | odd b     = exp_mod' (a^2 `rem` c) (shift b (0-1)) c ((s * a) `mod` c)
+          | otherwise = exp_mod' (a^2 `rem` c) (shift b (0-1)) c s
                   
 roman_numerals :: [(Int,String)]
 roman_numerals = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC")
@@ -189,23 +200,35 @@ roman_numerals = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC")
 to_roman :: Int -> String
 to_roman 0 = "N"
 to_roman x = to_roman' x
-    where
-	to_roman' x 
-	    | x == 0 = ""
-	    | x > 0 = b ++ to_roman' (x - a)
+  where
+      to_roman' x 
+	  | x == 0 = ""
+	  | x > 0 = b ++ to_roman' (x - a)
 	    where (a, b) = head $ filter ((<= x) . fst) roman_numerals
                            
--- NOT WORKING -Parses a string representation of roman numerals into there 
+-- Parses a string representation of roman numerals into there 
 -- arabic numeral equivalent.
 from_roman :: String -> Int
-from_roman str = sum $ map c str
-    where
-	c n
-	    | n == 'M' = 1000
-	    | n == 'D' = 500
-	    | n == 'C' = 100
-	    | n == 'L' = 50
-	    | n == 'X' = 10
-	    | n == 'V' = 5
-	    | n == 'I' = 1
-	    | otherwise = 0
+from_roman str = sum $ map f 
+                 $ replace "CM" "m"
+                 $ replace "CD" "d" 
+                 $ replace "XC" "c" 
+                 $ replace "XL" "l" 
+                 $ replace "IX" "x" 
+                 $ replace "IV" "v" str
+  where
+      f c
+          | c == 'M' = 1000
+          | c == 'm' = 900
+          | c == 'D' = 500
+          | c == 'd' = 400
+          | c == 'C' = 100
+          | c == 'c' = 90
+          | c == 'L' = 50
+          | c == 'l' = 40
+          | c == 'X' = 10
+          | c == 'x' = 9
+          | c == 'V' = 5
+          | c == 'v' = 4
+          | c == 'I' = 1
+ 

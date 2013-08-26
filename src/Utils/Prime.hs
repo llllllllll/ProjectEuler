@@ -5,7 +5,8 @@ module Utils.Prime
     , is_prime 
     ) where
 
-import Data.List    
+import Data.List
+import Data.Bits
 
 -- An infinite list of prime numbers.
 primes :: [Integer]
@@ -31,7 +32,8 @@ is_prime :: Integral a => a -> Bool
 is_prime n = is_prime' n (floor $ sqrt $ fromIntegral n)
     where 
         is_prime' n i
-            | i == 1 && n > 1 = True
+            | i == 1 && n > 1    = True
             | n == i*(n `div` i) = False
             | otherwise = is_prime' n (i-1)
-                          
+                           
+
