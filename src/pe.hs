@@ -16,7 +16,7 @@ import C_Problem_Wrapper
 import qualified C_Pe as C
 
 -- The file used to neatly wrap all problems to be imported by the Main module.
-problem_wrapper :: FilePath                                                                 
+problem_wrapper :: FilePath
 problem_wrapper = "/home/joejev/compsci/ProjectEuler/src/Problem_Wrapper.hs"
 
 -- Displays some basic information about my work.

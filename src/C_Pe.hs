@@ -60,7 +60,7 @@ open_problem p = do
                      >> wrap_import p >> mark_incomplete p
   where
       problem_template n = "// NOT YET COMPLETED.\n#include <stdlib.h>\n"
-                           ++ "#include <iostream>\ninclude <gmp.h>\n\n"
+                           ++ "#include <iostream>\n#include <gmp.h>\n\n"
                            ++ "int main(){\n    \n}"
 
 -- Marks problem_p as complete.
