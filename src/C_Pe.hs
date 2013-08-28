@@ -22,10 +22,9 @@ import Data.List
 import Data.Maybe
 import Control.Monad
 import Control.Applicative
-import Problem_Wrapper
 
 -- The file used to neatly wrap all problems to be imported by the Main module.
-problem_wrapper :: FilePath                                                                 
+problem_wrapper :: FilePath 
 problem_wrapper = "/home/joejev/compsci/ProjectEuler/src/C_Problem_Wrapper.hs"
 
 -- Returns the completion status of c_problem_p

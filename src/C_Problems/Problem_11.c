@@ -1,4 +1,4 @@
-// NOT YET COMPLETED.
+// 70600674 - Completed 8.27.2013
 #include <stdlib.h>
 #include <iostream>
 #include <gmp.h>

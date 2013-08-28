@@ -12,12 +12,13 @@ module C_Problem_Wrapper
     , c_problem_20
     , c_problem_13
     , c_problem_11
+    , c_problem_18
     ) where
 
 import System.Process
 import System.Directory
 
--- Compiles the c/c++ problem_p, prints the output then delets the binary.
+-- Compiles the c/c++ c_problem_p, prints the output then delets the binary.
 eval :: Int -> IO ()
 eval p = do
     system $ "g++ -o C_Problems/temp_proc C_Problems/Problem_"
@@ -56,3 +57,7 @@ c_problem_13 = eval 13
 
 c_problem_11 :: IO ()
 c_problem_11 = eval 11
+
+
+c_problem_18 :: IO ()
+c_problem_18 = eval 18
