@@ -11,9 +11,7 @@ import Utils.List
 
 type Triangle = (Vector,Vector,Vector)
 
-problem_102 = do
-    ts <- parse_triangles
-    return $ length $ filter (in_triangle (0,0)) ts
+problem_102 = length . filter (in_triangle (0,0)) <$> parse_triangles
 
 in_triangle :: Vector -> Triangle -> Bool
 in_triangle p (a,b,c) = let v0    = c |-| a
@@ -29,9 +27,8 @@ in_triangle p (a,b,c) = let v0    = c |-| a
                             v     = (dot00 * dot12 - dot01 * dot02) * inv_d
                         in u >= 0 && v >= 0 && u + v < 1
 
-parse_triangles = do
-    ts <- map (split_on (==',')) . lines <$> readFile "txt/triangles.txt"
-    return $ map mk_tri ts
+parse_triangles = 
+    map (mk_tri . split_on (==',')) . lines <$> readFile "txt/triangles.txt"
   where 
       mk_tri ps = let p = listArray (0,5) (map read ps) 
                   in ((p!0,p!1),(p!2,p!3),(p!4,p!5))
