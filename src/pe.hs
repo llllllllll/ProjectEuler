@@ -19,15 +19,23 @@ import qualified C_Pe as C
 problem_wrapper :: FilePath
 problem_wrapper = "/home/joejev/compsci/ProjectEuler/src/Problem_Wrapper.hs"
 
+-- The file containing the list of completed problems.
+dot_complete :: FilePath
+dot_complete = "/home/joejev/compsci/ProjectEuler/src/Problems/.complete"
+
+-- The file containing the list of incomplete problems.
+dot_incomplete :: FilePath
+dot_incomplete = "/home/joejev/compsci/ProjectEuler/src/Problems/.incomplete"
+
 -- Displays some basic information about my work.
 main :: IO ()
 main = putStrLn "Project Euler Work by Joe Jevnik"
 
--- Checks the completion status of problem_9
+-- Checks the completion status of problem_p
 check_status :: Int -> IO String
 check_status p = do
-    cs <- lines <$> readFile "Problems/.complete"
-    ws <- lines <$> readFile "Problems/.incomplete"
+    cs <- lines <$> readFile dot_complete
+    ws <- lines <$> readFile dot_incomplete
     return $ check_status' p cs ws
   where
       check_status' p cs ws
@@ -51,7 +59,7 @@ open_problem p = do
                                                    ++ show p ++ ".hs")) 
                      >> (system $ "emacs Problems/Problem_" 
                                     ++ show p ++ ".hs &") 
-                     >> appendFile "Problems/.incomplete" (show p)
+                     >> appendFile dot_incomplete (show p)
                      >> wrap_import p >> mark_incomplete p
   where
       problem_template n = "-- NOT YET COMPLETED.\nmodule Problems.Problem_" 
@@ -62,35 +70,35 @@ open_problem p = do
 -- Marks problem_p as complete.
 mark_complete :: Int -> IO ()
 mark_complete p = do
-    cs <- lines <$> readFile "Problems/.complete"
-    ws <- lines <$> readFile "Problems/.incomplete"
+    cs <- lines <$> readFile dot_complete
+    ws <- lines <$> readFile dot_incomplete
     unless (show p `elem` cs) $ do
                       let ws' = filter (/=show p) ws
-                      removeFile "Problems/.incomplete"
-                      appendFile "Problems/.incomplete" $ unlines ws'
-                      appendFile "Problems/.complete" $ '\n':show p
+                      removeFile dot_incomplete
+                      appendFile dot_incomplete $ unlines ws'
+                      appendFile dot_complete $ '\n':show p
 
 -- Marks problem_p as incomplete
 mark_incomplete :: Int -> IO ()
 mark_incomplete p = do
-    cs <- lines <$> readFile "Problems/.complete"
-    ws <- lines <$> readFile "Problems/.incomplete"
+    cs <- lines <$> readFile dot_complete
+    ws <- lines <$> readFile dot_incomplete
     unless (show p `elem` ws) $ do
                         let cs' = filter (/=show p) cs
-                        removeFile "Problems/.complete"
-                        appendFile "Problems/.complete" $ unlines cs'
-                        appendFile "Problems/.incomplete" $ '\n':show p
+                        removeFile dot_complete
+                        appendFile dot_complete $ unlines cs'
+                        appendFile dot_incomplete $ '\n':show p
 
 -- Marks a problem as not yet started.
 mark_not_started :: Int -> IO ()
 mark_not_started p = do
-    cs <- lines <$> readFile "Problems/.complete"
-    ws <- lines <$> readFile "Problems/.incomplete"
+    cs <- lines <$> readFile dot_complete
+    ws <- lines <$> readFile dot_incomplete
     let cs' = filter (/=show p) cs
         ws' = filter (/=show p) ws
-    mapM_ removeFile ["Problems/.incomplete","Problems/.complete"]
-    appendFile "Problems/.complete" $ unlines cs'
-    appendFile "Problems/.incomplete" $ unlines ws'
+    mapM_ removeFile [dot_incomplete,dot_complete]
+    appendFile dot_complete $ unlines cs'
+    appendFile dot_incomplete $ unlines ws'
 
 -- Adds a problem to the Problem_Wrapper list.
 wrap_import :: Int -> IO ()
@@ -114,12 +122,12 @@ unwrap_import p = do
 -- Returns a list of problems that are completed.
 ls_complete :: IO [Int]
 ls_complete = sort . (map read) . filter (/="") . lines 
-              <$> readFile "Problems/.complete"
+              <$> readFile dot_complete
 
 -- Returns a list of problems that are incomplete.
 ls_incomplete :: IO [Int]
 ls_incomplete = sort . (map read) . filter (/="") . lines
-                <$> readFile "Problems/.incomplete"
+                <$> readFile dot_incomplete
 
 -- Returns the number of problems that are marked complete.
 count_complete :: IO Int

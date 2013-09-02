@@ -22,7 +22,7 @@ import System.Directory
 eval :: Int -> IO ()
 eval p = do
     system $ "g++ -o C_Problems/temp_proc C_Problems/Problem_"
-               ++ show p ++ ".c -lm -lgmp"
+               ++ show p ++ ".c -lm -lgmp -Wall"
     readProcess "C_Problems/temp_proc" [] [] >>= putStrLn
     removeFile "C_Problems/temp_proc"
 
