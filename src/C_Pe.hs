@@ -55,7 +55,8 @@ open_problem p = do
       then (system $ "emacs C_Problems/Problem_" ++ show p ++ ".c &") 
                  >> return ()
       else do
-          putStr "Problem has not been started, Would you like to start it (Y/n)"
+          putStr $ "Problem " ++ show p ++
+                     " has not been started, Would you like to start it (Y/n):"
           inp <- getLine
           unless (inp `elem` ["n","N"]) 
                      $ (system ("echo \"" ++ problem_template p 

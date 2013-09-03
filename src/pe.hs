@@ -27,6 +27,10 @@ dot_complete = "/home/joejev/compsci/ProjectEuler/src/Problems/.complete"
 dot_incomplete :: FilePath
 dot_incomplete = "/home/joejev/compsci/ProjectEuler/src/Problems/.incomplete"
 
+-- The file containing the template for the mk_binary output.
+bin_template :: FilePath
+bin_template = "/home/joejev/compsci/ProjectEuler/src/bin_template"
+
 -- Displays some basic information about my work.
 main :: IO ()
 main = putStrLn "Project Euler Work by Joe Jevnik"
@@ -52,11 +56,13 @@ open_problem p = do
     if s `elem` ["Complete","Incomplete"] 
       then (system $ "emacs Problems/Problem_" ++ show p ++ ".hs &") >> return ()
       else do
-          putStr "Problem has not been started, Would you like to start it (Y/n): "
+          putStr $ "Problem "  ++ show p ++ 
+                     " has not been started, Would you like to start it (Y/n):"
           inp <- getLine
-          unless (inp `elem` ["n","N"]) $ (system ("echo \"" ++ problem_template p 
-                                                   ++ "\" > Problems/Problem_" 
-                                                   ++ show p ++ ".hs")) 
+          unless (inp `elem` ["n","N"]) 
+                     $ (system ("echo \"" ++ problem_template p 
+                                              ++ "\" > Problems/Problem_" 
+                                                     ++ show p ++ ".hs")) 
                      >> (system $ "emacs Problems/Problem_" 
                                     ++ show p ++ ".hs &") 
                      >> appendFile dot_incomplete (show p)
@@ -147,12 +153,13 @@ count_incomplete = length <$> ls_incomplete
 --            -c                   : prefix to above to call C_Pe equivelent.
 mk_binary :: IO ()
 mk_binary = do
+    bin  <- io_bin_template
     time <- getCurrentTime
     fs   <- map mk_fun <$> ls_complete
     cfs  <- map c_mk_fun <$> C.ls_complete
-    let h   = head bin_template
-        c_  = bin_template!!1
-        ca  = bin_template!!2
+    let h   = head bin
+        c_  = bin!!1
+        ca  = bin!!2
         gs  = mk_guards fs
         cgs = mk_guards cfs
         vrs = "\"Joe Jevnik's work on Project Euler as of " ++ show time ++ "\""
@@ -167,13 +174,12 @@ mk_binary = do
       c_mk_fun :: Int -> String
       c_mk_fun p = "c_problem_" ++ show p
       mk_guards :: [String] -> String
-      mk_guards ps = (concatMap (\p -> "    | p == " 
-                                 ++ fromMaybe (drop 10 p) (stripPrefix "problem_" p)  
-                                 ++ " = print " ++ p ++ "\n") ps)
+      mk_guards ps = 
+          (concatMap (\p -> "    | p == " 
+                            ++ fromMaybe (drop 10 p) (stripPrefix "problem_" p)
+                                   ++ " = print " ++ p ++ "\n") ps)
                      ++ "    | otherwise = error \"Problem not complete.\"\n\n"
 
-bin_template :: [String]
-bin_template = [ "module Main where\n\nimport System.IO\nimport System.Process\nimport System.Directory\nimport System.Environment\nimport Data.List\nimport Data.Maybe\nimport Data.Time\nimport Control.Monad\nimport Control.Applicative\nimport Problem_Wrapper\nimport C_Problem_Wrapper\nimport qualified C_Pe as C\n\nmain :: IO ()\nmain = do\n    args <- getArgs\n    check_args args\n  where\n      check_args args\n          | head args == \"--help\"    = help\n          | head args == \"--version\" = version\n          | head args == \"-c\"        = parse_c (tail args)\n          | otherwise                = parse_args args\n\nhelp :: IO ()\nhelp = putStrLn \"Arguments: problem <p>          : Calls the problem_p\\nls <(in)complete>    : C\\nalls ls_(in)complete\\ncount <(in)complete> : Calls count_(in)complete\\nopen <p>             : Calls open_problem p\\n-c                   : prefix to above to call C_Pe equivelent.\"\n\nparse_args :: [String] -> IO ()\nparse_args args\n    | head args == \"problem\" = call_problem (read (args!!1) :: Int)\n    | head args == \"ls\"      = list (args!!1)\n    | head args == \"count\"   = count (args!!1)\n    | head args == \"open\"    = open_problem (read (args!!1) :: Int)\n    | otherwise              = error $ \"Unexpected parameter \" ++ head args\n                               ++ \". Expected [-c,problem <p>,\"\n                               ++ \"ls <(in)complete>,count <(in)complete>,\"\n                               ++ \"open <p>]\"\n\nparse_c :: [String] -> IO ()\nparse_c args\n    | head args == \"problem\" = c_call_problem (read (args!!1) :: Int)\n    | head args == \"ls\"      = c_list (args!!1)\n    | head args == \"count\"   = c_count (args!!1)\n    | head args == \"open\"    = C.open_problem (read (args!!1) :: Int)\n    | otherwise              = error $ \"Unexpected parameter \" ++ head args\n                               ++ \". Expected [problem <p>,ls <(in)complete>,\"\n                               ++ \" count <(in)complete>,open <p>]\"\n\n\nlist :: String -> IO ()\nlist str\n    | str == \"complete\"   = ls_complete\n    | str == \"incomplete\" = ls_incomplete\n    | otherwise           = error $ \"Unexpected parameter \" ++ str \n                            ++ \". Expected complete or incomplete\"\n\nc_list :: String -> IO ()\nc_list str\n    | str == \"complete\"   = C.ls_complete\n    | str == \"incomplete\" = C.ls_incomplete\n    | otherwise           = error $ \"Unexpected parameter \" ++ str \n                            ++ \". Expected complete or incomplete\"\ncount :: String -> IO Int\ncount str\n    | str == \"complete\"   = count_complete\n    | str == \"incomplete\" = count_incomplete\n    | otherwise           = error $ \"Unexpected parameter \" ++ str \n                            ++ \". Expected complete or incomplete\"\n\nc_count :: String -> IO Int\nc_count str\n    | str == \"complete\"   = C.count_complete\n    | str == \"incomplete\" = C.count_incomplete\n    | otherwise           = error $ \"Unexpected parameter \" ++ str \n                            ++ \". Expected complete or incomplete\"\n\n\nls_complete :: IO [Int]\nls_complete = (map read) . filter (/=\"\") . lines\n              <$> readFile \"Problems/.complete\"\n\nls_incomplete :: IO [Int]\nls_incomplete = (map read) . filter (/=\"\") . lines\n                <$> readFile \"Problems/.incomplete\"\n\ncount_complete :: IO Int\ncount_complete = length <$> ls_complete\n\ncount_incomplete :: IO Int\ncount_incomplete = length <$> ls_incomplete\n\nopen_problem :: Int -> IO ()\nopen_problem p = do\n    s <- check_status p\n    if s `elem` [\"Complete\",\"Incomplete\"]\n      then (system $ \"emacs Problems/Problem_\" ++ show p ++ \".hs &\") >> return ()\n      else do\n          putStr \"Problem has not been started, Would you like to start it (Y/n): \"\n          inp <- getLine\n          unless (inp `elem` [\"n\",\"N\"]) $ (system (\"echo \\\"\" ++ problem_template p\n                                                   ++ \"\\\" > Problems/Problem_\" \n                                                   ++ show p ++ \".hs\"))\n                     >> (system $ \"emacs Problems/Problem_\"\n                                    ++ show p ++ \".hs &\")\n                     >> appendFile \"Problems/.incomplete\" (show p)\n                     >> wrap_import p >> mark_incomplete p\n  where\n      problem_template n = \"-- NOT YET COMPLETED.\\nmodule Problems.Problem_\" \n                           ++ show n ++ \"\\n    ( problem_\" ++ show n \n                           ++ \"\\n    ) where\\n\\nproblem_\" ++ show n \n                           ++ \" = \"\n\ncheck_status :: Int -> IO String\ncheck_status p = do\n    cs <- lines <$> readFile \"Problems/.complete\"\n    ws <- lines <$> readFile \"Problems/.incomplete\"\n    return $ check_status' p cs ws\n  where\n      check_status' p cs ws\n          | show p `elem` cs = \"Complete\"\n          | show p `elem` ws = \"Incomplete\"\n          | otherwise = \"Not yet started\"\n\n-- GENERATED AUTOMATICALLY PAST THIS POINT\n\nwrap_import :: Int -> IO ()\nwrap_import _ = return ()\n\nmark_incomplete :: Int -> IO ()\nmark_incomplete _ = return ()\n\nversion :: IO ()\nversion = putStrLn "
-               , "c_call_problem p\n"
-               , "call_problem p\n" ]
-    
+io_bin_template :: IO [String]
+io_bin_template = readFile bin_template 
+                  >>= (\h -> return $ h:"c_call_problem p\n":["call_problem p\n"])   
