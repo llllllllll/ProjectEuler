@@ -52,7 +52,7 @@ open_problem :: Int -> IO ()
 open_problem p = do
     s <- check_status p
     if s `elem` ["Complete","Incomplete"] 
-      then (system $ "emacs C_Problems/Problem_" ++ show p ++ ".c &") 
+      then (system $ "emacs C_Problems/Problem_" ++ show p ++ ".cpp &") 
                  >> return ()
       else do
           putStr $ "Problem " ++ show p ++
@@ -61,9 +61,9 @@ open_problem p = do
           unless (inp `elem` ["n","N"]) 
                      $ (system ("echo \"" ++ problem_template p 
                                 ++ "\" > C_Problems/Problem_" 
-                                ++ show p ++ ".c")) 
+                                ++ show p ++ ".cpp")) 
                      >> (system $ "emacs C_Problems/Problem_" 
-                                    ++ show p ++ ".c &") 
+                                    ++ show p ++ ".cpp &") 
                      >> appendFile dot_incomplete (show p) 
                      >> wrap_import p >> mark_incomplete p
   where
