@@ -3,14 +3,13 @@
 -- Utilities for working on Project Euler problems in Haskell.
 module Main where
 
-import System.IO
-import System.Process
-import System.Directory
-import Data.List
-import Data.Maybe
-import Data.Time
-import Control.Monad
-import Control.Applicative
+import System.Process (system)
+import System.Directory (removeFile)
+import Data.List (sort,isInfixOf,stripPrefix)
+import Data.Maybe (fromMaybe)
+import Data.Time (getCurrentTime)
+import Control.Monad (unless)
+import Control.Applicative ((<$>))
 import Problem_Wrapper
 import C_Problem_Wrapper
 import qualified C_Pe as C
@@ -157,29 +156,56 @@ mk_binary = do
     time <- getCurrentTime
     fs   <- map mk_fun <$> ls_complete
     cfs  <- map c_mk_fun <$> C.ls_complete
+    cs   <- ls_complete
+    funs <-  mapM (readFile . (\p -> "Problems/Problem_" ++ show p ++ ".hs")) cs
     let h   = head bin
         c_  = bin!!1
         ca  = bin!!2
         gs  = mk_guards fs
         cgs = mk_guards cfs
-        vrs = "\"Joe Jevnik's work on Project Euler as of " ++ show time ++ "\""
+        vrs = " \"Joe Jevnik's work on Project Euler as of " ++ show time ++ "\""
         out = concat [h,vrs ++ "\n\n",c_,cgs,ca,gs]
         fil = "../bin/" ++ take 10 (show time) ++ ".hs"
-    appendFile fil out
+    appendFile fil (out ++ insert_funs funs)
     system $ "ghc --make ../bin/" ++ fil
     return ()
   where
+      insert_funs :: [String] -> String
+      insert_funs funs = concat [unlines $ drop 5 (filter (\p -> not ("import" `isInfixOf` p)) (lines f)) | f <- funs]
       mk_fun :: Int -> String
       mk_fun p = "problem_" ++ show p
       c_mk_fun :: Int -> String
       c_mk_fun p = "c_problem_" ++ show p
       mk_guards :: [String] -> String
       mk_guards ps = 
-          (concatMap (\p -> "    | p == " 
+          (concatMap (\p -> "    | head args == \"problem\" && args!!1 == show "
                             ++ fromMaybe (drop 10 p) (stripPrefix "problem_" p)
-                                   ++ " = print " ++ p ++ "\n") ps)
+                                  ++ " = " ++ p ++ "\n") ps)
                      ++ "    | otherwise = error \"Problem not complete.\"\n\n"
 
 io_bin_template :: IO [String]
 io_bin_template = readFile bin_template 
-                  >>= (\h -> return $ h:"c_call_problem p\n":["call_problem p\n"])   
+                  >>= (\h -> return $ h:"parse_c args\n":["parse_args args\n"])
+
+{-
+parse_args :: [String] -> IO ()
+parse_args args
+    | head args == "problem" = call_problem (read (args!!1) :: Int)
+    | head args == "ls"      = list (args!!1)
+    | head args == "count"   = count (args!!1)
+    | head args == "open"    = open_problem (read (args!!1) :: Int)
+    | otherwise              = error $ "Unexpected parameter " ++ head args
+                               ++ ". Expected [-c,problem <p>,"
+                               ++ "ls <(in)complete>,count <(in)complete>,"
+                               ++ "open <p>]"
+
+parse_c :: [String] -> IO ()
+parse_c args
+    | head args == "problem" = c_call_problem (read (args!!1) :: Int)
+    | head args == "ls"      = c_list (args!!1)
+    | head args == "count"   = c_count (args!!1)
+    | head args == "open"    = C.open_problem (read (args!!1) :: Int)
+    | otherwise              = error $ "Unexpected parameter " ++ head args
+                               ++ ". Expected [problem <p>,ls <(in)complete>,"
+                               ++ " count <(in)complete>,open <p>]"
+-}

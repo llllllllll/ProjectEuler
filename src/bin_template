@@ -7,11 +7,22 @@ import System.Environment
 import Data.List
 import Data.Maybe
 import Data.Time
+import Data.Ratio
+import Data.Function
+import Data.Array
+import Data.Char
+import Data.Bits
 import Control.Monad
 import Control.Applicative
-import Problem_Wrapper
+import Numeric
 import C_Problem_Wrapper
 import qualified C_Pe as C
+import Utils.Misc
+import Utils.Prime
+import Utils.Sequence
+import Utils.Vector
+import Utils.Constant
+import Utils.List
 
 main :: IO ()
 main = do
@@ -27,39 +38,18 @@ main = do
 help :: IO ()
 help = putStrLn "Arguments: problem <p>          : Calls the problem_p\nls <(in)complete>    : C\nalls ls_(in)complete\ncount <(in)complete> : Calls count_(in)complete\nopen <p>             : Calls open_problem p\n-c                   : prefix to above to call C_Pe equivelent."
 
-parse_args :: [String] -> IO ()
-parse_args args
-    | head args == "problem" = call_problem (read (args!!1) :: Int)
-    | head args == "ls"      = list (args!!1)
-    | head args == "count"   = count (args!!1)
-    | head args == "open"    = open_problem (read (args!!1) :: Int)
-    | otherwise              = error $ "Unexpected parameter " ++ head args
-                               ++ ". Expected [-c,problem <p>,"
-                               ++ "ls <(in)complete>,count <(in)complete>,"
-                               ++ "open <p>]"
-
-parse_c :: [String] -> IO ()
-parse_c args
-    | head args == "problem" = c_call_problem (read (args!!1) :: Int)
-    | head args == "ls"      = c_list (args!!1)
-    | head args == "count"   = c_count (args!!1)
-    | head args == "open"    = C.open_problem (read (args!!1) :: Int)
-    | otherwise              = error $ "Unexpected parameter " ++ head args
-                               ++ ". Expected [problem <p>,ls <(in)complete>,"
-                               ++ " count <(in)complete>,open <p>]"
-
 
 list :: String -> IO ()
 list str
-    | str == "complete"   = ls_complete
-    | str == "incomplete" = ls_incomplete
+    | str == "complete"   = print =<<ls_complete
+    | str == "incomplete" = print =<< ls_incomplete
     | otherwise           = error $ "Unexpected parameter " ++ str 
                             ++ ". Expected complete or incomplete"
 
 c_list :: String -> IO ()
 c_list str
-    | str == "complete"   = C.ls_complete
-    | str == "incomplete" = C.ls_incomplete
+    | str == "complete"   = print =<< C.ls_complete
+    | str == "incomplete" = print =<< C.ls_incomplete
     | otherwise           = error $ "Unexpected parameter " ++ str 
                             ++ ". Expected complete or incomplete"
 count :: String -> IO Int
@@ -75,7 +65,6 @@ c_count str
     | str == "incomplete" = C.count_incomplete
     | otherwise           = error $ "Unexpected parameter " ++ str 
                             ++ ". Expected complete or incomplete"
-
 
 ls_complete :: IO [Int]
 ls_complete = (map read) . filter (/="") . lines
@@ -132,5 +121,4 @@ mark_incomplete :: Int -> IO ()
 mark_incomplete _ = return ()
 
 version :: IO ()
-version = putStrLn 
-
+version = putStrLn
