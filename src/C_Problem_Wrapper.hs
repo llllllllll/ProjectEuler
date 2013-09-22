@@ -14,6 +14,7 @@ module C_Problem_Wrapper
     , c_problem_11
     , c_problem_18
     , c_problem_67
+    , c_problem_19
     ) where
 
 import System.Process
@@ -65,3 +66,6 @@ c_problem_18 = eval 18
 
 c_problem_67 :: IO ()
 c_problem_67 = eval 67
+
+c_problem_19 :: IO ()
+c_problem_19 = eval 19
