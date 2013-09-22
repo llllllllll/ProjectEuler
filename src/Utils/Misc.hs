@@ -28,6 +28,7 @@ module Utils.Misc
     , mod_exp
     , to_roman
     , from_roman
+    , show_engl
     ) where
 
 import Data.List
@@ -231,4 +232,45 @@ from_roman str = sum $ map f
           | c == 'V' = 5
           | c == 'v' = 4
           | c == 'I' = 1
- 
+
+-- Converts an Int to its english representation.
+show_engl :: Int -> String
+show_engl n
+    | n < 0 = "negative " ++ show_engl (-n)
+    | n < 20 = us!!n
+    | n < 100 = ts!!(n `div` 10) ++ (if n `rem` 10 /= 0
+                                   then " "
+                                   else "") ++ us!!(n `rem` 10)
+    | n < 1000 = us!!(n `div` 100) ++ " hundred" ++ (if n `rem` 100 /= 0
+                                                       then " and"
+                                                       else "")
+                 ++ show_engl (n `rem` 100)
+    | n < 1000000 = show_engl (n `div` 1000) ++ " thousand" ++ 
+                    (if n `rem` 1000 /= 0
+                       then " "
+                       else "") ++ show_engl (n `rem` 1000)
+    | n < 1000000000 = show_engl (n `div` 100000) ++ " million" ++
+                       (if n `rem` 1000000 /= 0
+                          then " "
+                          else "") ++ show_engl (n `rem` 1000000)
+    | otherwise = show_engl (n `div` 1000000000) ++ " billion" ++
+                  (if n `rem` 1000000000 /= 0
+                     then " "
+                     else "") ++ show_engl (n `rem` 1000000000)
+  where
+      us :: [String]
+      us = ["", "one", "two", "three", "four", "five", "six", "seven"
+           , "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen"
+           , "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" ]
+
+      ts :: [String]
+      ts = [ "",""
+           , "twenty"
+           , "thirty"
+           , "forty"
+           , "fifty"
+           , "sixty"
+           , "seventy"
+           , "eighty"
+           , "ninety"
+           ]
