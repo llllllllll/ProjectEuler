@@ -3,7 +3,7 @@ module Problems.Problem_12
     ( problem_12
     ) where
 
-import Utils.Misc
+import Utils.Misc (num_divisors)
 
 problem_12 = head [x | x <- tri_nums, num_divisors x > 500]
     where

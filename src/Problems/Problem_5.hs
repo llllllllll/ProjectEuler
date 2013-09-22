@@ -3,6 +3,6 @@ module Problems.Problem_5
     ( problem_5
     ) where
 
-import Data.List
+import Data.List (foldl)
 
 problem_5 = foldl (lcm) 1 [1..20]

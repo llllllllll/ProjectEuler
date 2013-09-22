@@ -3,6 +3,6 @@ module Problems.Problem_2
     ( problem_2
     ) where
 
-import Utils.Sequence    
+import Utils.Sequence (fib)
 
 problem_2 = sum [x | x <- takeWhile (<4000000) (map fib [2..]), even x]

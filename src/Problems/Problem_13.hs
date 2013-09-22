@@ -3,7 +3,7 @@ module Problems.Problem_13
     ( problem_13
     ) where
 
-import Utils.Misc
+import Utils.List (head_n)
 
 problem_13 = head_n 10 a
 	where a = sum [37107287533902102798797998220837590246510135740250,

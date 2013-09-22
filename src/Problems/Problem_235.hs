@@ -4,7 +4,7 @@ module Problem_235
     ( problem_235
     ) where
 
-import Utils.Misc
+import Utils.Misc (bisection_search)
 
 problem_235 = bisection_search f (0-600000000000) (1,1.5) 0.000000000001
     where

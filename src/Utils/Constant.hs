@@ -3,8 +3,6 @@ module Utils.Constant
     , champernowne
     ) where
 
-import Data.List
-
 -- Euler's number.
 e = exp 1
 

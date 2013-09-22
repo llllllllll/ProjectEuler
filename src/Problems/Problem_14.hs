@@ -3,7 +3,7 @@ module Problems.Problem_14
     ( problem_14
     ) where
 
-import Utils.Sequence
+import Utils.Sequence (collatz_mem,collatz)
 
 problem_14 = collatz_mem (10^6) (0,0)
     where

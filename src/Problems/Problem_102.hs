@@ -4,10 +4,10 @@ module Problems.Problem_102
     , in_triangle
     ) where
 
-import Control.Applicative
-import Data.Array
-import Utils.Vector
-import Utils.List
+import Control.Applicative ((<$>))
+import Data.Array (listArray,(!))
+import Utils.Vector (Vector(..),(|-|),(|.|))
+import Utils.List (split_on)
 
 type Triangle = (Vector,Vector,Vector)
 

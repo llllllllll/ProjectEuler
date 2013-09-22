@@ -3,8 +3,8 @@ module Problems.Problem_34
     ( problem_34
     ) where
 
-import Utils.List
-import Utils.Misc
+import Utils.List (int_to_list)
+import Utils.Misc (factorial)
 
 problem_34 = sum [x | x <- [3..99999], is_curious x]
     where

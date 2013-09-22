@@ -3,8 +3,8 @@ module Problems.Problem_40
     ( problem_40
     ) where
 
-import Data.Char
-import Utils.Constant
+import Data.Char (digitToInt)
+import Utils.Constant (champernowne)
 
 problem_40 = product $ map (digitToInt . (!!) champernowne) indecies
     where

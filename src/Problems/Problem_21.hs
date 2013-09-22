@@ -3,7 +3,7 @@ module Problems.Problem_21
     ( problem_21
     ) where
 
-import Utils.Misc
+import Utils.Misc (divisors)
 
 problem_21 = sum [a | a <- [1..9999], is_amicable a]
     where

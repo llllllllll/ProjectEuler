@@ -3,6 +3,6 @@ module Problems.Problem_10
     ( problem_10
     ) where
 
-import Utils.Prime
+import Utils.Prime (primes)
 
 problem_10 = sum $ takeWhile (<2000000) primes

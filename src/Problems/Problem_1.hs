@@ -4,7 +4,7 @@ module Problems.Problem_1
     , problem_1'
     ) where
 
-import Data.List
+import Data.List (union)
 
 problem_1 = sum [x | x <- [1..999], x `rem` 3 == 0 || x `rem` 5 == 0]
 

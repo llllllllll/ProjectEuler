@@ -3,12 +3,11 @@ module Problems.Problem_99
     ( problem_99
     ) where
 
-import System.IO
-import Control.Monad
-import Control.Applicative
-import Data.Function
-import Data.List
-import Utils.List
+import System.IO (readFile)
+import Control.Applicative ((<$>))
+import Data.Function (on)
+import Data.List (maximumBy,elemIndex)
+import Utils.List (split_on)
 
 problem_99 = do
     file <- readFile "txt/base_exp.txt"

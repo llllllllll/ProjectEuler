@@ -3,10 +3,11 @@ module Utils.List
     , list_to_int
     , elem_count
     , split_on
+    , head_n
+    , last_n
     ) where
     
-import Data.Char
-import Data.List
+import Data.Char (digitToInt)
             
 -- Convert an Integral to a list of its digits. eg: int_to_list 123 = [1,2,3].
 int_to_list n = map digitToInt $ show n
@@ -30,3 +31,9 @@ split_on p s =  case dropWhile p s of
     		    "" -> []
                     s' -> w : split_on p s''
                         where (w, s'') = break p s'
+
+-- Returns the first d digits of n.
+head_n d n = list_to_int $ take d (int_to_list n)
+
+-- Returns the last d digits of n.
+last_n d n = read $ reverse $ take d $ (reverse . show) n :: Integer

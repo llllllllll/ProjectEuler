@@ -3,6 +3,6 @@ module Problems.Problem_97
     ( problem_97
     ) where
 
-import Utils.Misc
+import Utils.List (last_n)
 
 problem_97 = last_n 10 $ 28433*2^(7830457)+1

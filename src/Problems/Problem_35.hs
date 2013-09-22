@@ -3,9 +3,9 @@ module Problems.Problem_35
     ( problem_35
     ) where
 
-import Data.List
-import Utils.Prime
-import Utils.List
+import Data.List (takeWhile,zipWith,inits,tails)
+import Utils.Prime (is_prime,primes)
+import Utils.List (list_to_int,int_to_list)
 
 problem_35 = length [n | n <- takeWhile (<1000000) primes, is_valid n]
     where

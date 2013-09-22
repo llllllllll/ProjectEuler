@@ -8,8 +8,6 @@ module Utils.Misc
     , is_increasing
     , is_pandigitalr
     , is_pandigital
-    , head_n
-    , last_n
     , nCr
     , nPr
     , is_int
@@ -31,12 +29,12 @@ module Utils.Misc
     , show_engl
     ) where
 
-import Data.List
-import Data.Array
-import Data.Bits
-import Data.String.Utils
-import Utils.List
-import Utils.Prime
+import Data.List (genericLength,nub,(\\),sort)
+import Data.Array (bounds,(!))
+import Data.Bits (Bits(..),shift)
+import Data.String.Utils (replace)
+import Utils.List (int_to_list,list_to_int)
+import Utils.Prime (prime_factors_mult)
 
 -- A list of all divisors of n.
 divisors :: Integral a => a -> [a]
@@ -93,12 +91,6 @@ is_pandigital (a,b) n = (length . int_to_list) n == b && is_pandigital' [a..b]
 	  | n `elem` ab && not ( n `elem` vals) = is_pandigital'
                                                     ab ns (n:vals)
 	  | otherwise = False
-
--- Returns the first d digits of n.
-head_n d n = list_to_int $ take d (int_to_list n)
-
--- Returns the last d digits of n.
-last_n d n = read $ reverse $ take d $ (reverse . show) n :: Integer
 
 -- Number of combinations of n choose r.
 n `nCr` r = factorial n / (factorial r * factorial (n-r))

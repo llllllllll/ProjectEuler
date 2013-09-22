@@ -6,8 +6,8 @@ module Utils.Prime
     , is_prime'
     ) where
 
-import Data.List
-import Data.Bits
+import Data.List (group)
+import Data.Bits (Bits(..),shift)
 
 -- An infinite list of prime numbers.
 primes :: [Integer]

@@ -3,9 +3,9 @@ module Problems.Problem_69
     ( problem_69
     ) where
 
-import Data.Function
-import Data.List
-import Utils.Misc
+import Data.Function (on)
+import Data.List (sortBy)
+import Utils.Misc (euler_totient)
 
 problem_69 =  last $ sortBy (compare `on` snd) 
               [(n, (fromIntegral n) / (fromIntegral . euler_totient) n) | 

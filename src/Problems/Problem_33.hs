@@ -3,9 +3,9 @@ module Problems.Problem_33
     ( problem_33
     ) where
 
-import Data.Ratio
-import Data.List
-import Utils.List
+import Data.Ratio ((%),denominator)
+import Data.List (delete,intersect)
+import Utils.List (list_to_int,int_to_list)
 
 problem_33 = denominator $ product 
              [a%b | a <- [10..99], b <- [10..99], 

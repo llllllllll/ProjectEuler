@@ -3,6 +3,6 @@ module Problems.Problem_48
     ( problem_48
     ) where
 
-import Utils.Misc
+import Utils.List (last_n)
 
 problem_48 = last_n 10 (sum (map (\x -> x^x) [1..1000]))

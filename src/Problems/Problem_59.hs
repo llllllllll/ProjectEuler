@@ -3,11 +3,11 @@ module Problems.Problem_59
     ( problem_59
     ) where
 
-import System.IO
-import Data.List
-import Data.Char
-import Data.Bits
-import Utils.List
+import System.IO (readFile,print)
+import Data.List (cycle)
+import Data.Char (ord)
+import Data.Bits (xor)
+import Utils.List (split_on)
 
 problem_59 = do
     file <- readFile "txt/cipher1.txt"

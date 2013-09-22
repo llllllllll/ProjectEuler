@@ -3,7 +3,7 @@ module Problems.Problem_43
     ( problem_43
     ) where
 
-import Data.List
+import Data.List (permutations)
 
 problem_43 = sum $ (map (read) [x | x <- permutations ['0'..'9'], 
                                 is_valid x] :: [Integer])

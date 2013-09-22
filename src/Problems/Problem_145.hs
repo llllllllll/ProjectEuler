@@ -3,8 +3,8 @@ module Problems.Problem_145
     ( problem_145
     ) where
 
-import Data.Char
-import Utils.List
+import Data.Char (digitToInt)
+import Utils.List (int_to_list)
 
 problem_145 = 2* length [(n, rev n) | n <- [1..10^9], 
                          let l = int_to_list n 

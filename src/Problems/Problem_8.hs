@@ -3,9 +3,9 @@ module Problems.Problem_8
     ( problem_8
     ) where
 
-import System.IO
-import Data.Char
-import Data.Array
+import System.IO (readFile,print)
+import Data.Char (digitToInt)
+import Data.Array (listArray,(!))
 
 problem_8 = do
     file <- readFile "txt/problem_8.txt"

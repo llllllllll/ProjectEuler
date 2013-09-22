@@ -3,8 +3,8 @@ module Problems.Problem_74
     ( problem_74
     ) where
 
-import Utils.List
-import Utils.Misc
+import Utils.List (int_to_list)
+import Utils.Misc (factorial)
 
 problem_74 = length [f_chain n| n <- [1..999999], is_valid n]
     where

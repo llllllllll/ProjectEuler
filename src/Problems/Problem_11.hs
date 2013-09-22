@@ -3,7 +3,7 @@ module Problems.Problem_11
     ( problem_11
     ) where
 
-import Data.Array
+import Data.Array ((!),listArray)
 
 problem_11 = maximum [ maximum [horizontal r n | r <- [0..19], n <- [0..15]]
                      , maximum [vertical r n | r <- [0..15], n <- [0..19]]

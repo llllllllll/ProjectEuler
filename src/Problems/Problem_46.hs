@@ -3,7 +3,7 @@ module Problems.Problem_46
     ( problem_46
     ) where
 
-import Utils.Prime
+import Utils.Prime (primes,is_prime)
 
 problem_46 = (fst . head) [(n,[(a,b)| a <- takeWhile (<=n) primes, 
                                b <- takeWhile (<=(n-a)`div`2) squares, 

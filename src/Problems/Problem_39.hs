@@ -3,9 +3,9 @@ module Problems.Problem_39
     ( problem_39
     ) where
 
-import Data.List
-import Data.Function
-import Utils.Misc
+import Data.List (sortBy,group,sort)
+import Data.Function (on)
+import Utils.Misc (is_int)
 
 problem_39 = round $ head $ last $ sortBy (compare `on` length) $ group $ 
              sort [let c = sqrt (a^2 + b^2) in a+b+c | a <- [1..998], 

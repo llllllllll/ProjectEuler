@@ -3,8 +3,8 @@ module Problems.Problem_36
     ( problem_36
     ) where
 
-import Data.Char
-import Numeric
+import Data.Char (intToDigit)
+import Numeric (showIntAtBase)
 
 problem_36 = sum [n | n <- [1..999999], 
                   show n == (reverse . show) n 

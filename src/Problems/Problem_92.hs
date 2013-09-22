@@ -3,7 +3,7 @@ module Problems.Problem_92
     ( problem_92
     ) where
 
-import Utils.List
+import Utils.List (int_to_list)
 
 problem_92 = length $ [n | n <- [1..100000], sq_chain n]
     where

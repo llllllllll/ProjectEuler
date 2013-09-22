@@ -3,6 +3,6 @@ module Problems.Problem_3
     ( problem_3
     ) where
 
-import Utils.Prime
+import Utils.Prime (prime_factors)
 
 problem_3 = last $ prime_factors 600851475143

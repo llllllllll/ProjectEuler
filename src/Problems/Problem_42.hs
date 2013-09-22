@@ -3,9 +3,9 @@ module Problems.Problem_42
     ( problem_42
     ) where
 
-import System.IO
-import Data.List
-import Utils.List
+import System.IO (readFile)
+import Data.List (dropWhile)
+import Utils.List (split_on)
 
 problem_42 = do
     file <- readFile "txt/words.txt"

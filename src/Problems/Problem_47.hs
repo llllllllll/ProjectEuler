@@ -3,8 +3,8 @@ module Problems.Problem_47
     ( problem_47
     ) where
 
-import Data.List
-import Utils.Prime
+import Data.List (nub)
+import Utils.Prime (prime_factors)
 
 problem_47 = head [n | n <- [1..], is_valid n]
     where

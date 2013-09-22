@@ -3,8 +3,8 @@ module Problems.Problem_52
     ( problem_52
     ) where
 
-import Data.List
-import Utils.List
+import Data.List (nub,sort)
+import Utils.List (int_to_list)
 
 problem_52 = head [n | n <- [1..], is_valid n]
     where

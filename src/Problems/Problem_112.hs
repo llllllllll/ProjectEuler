@@ -3,8 +3,8 @@ module Problems.Problem_112
     ( problem_112
     ) where
 
-import Data.Ratio
-import Utils.Misc
+import Data.Ratio ((%))
+import Utils.Misc (is_bouncy)
 
 problem_112 = p 21780 19602
     where

@@ -3,6 +3,6 @@ module Problems.Problem_7
     ( problem_7
     ) where
 
-import Utils.Prime
+import Utils.Prime (primes)
 
 problem_7 = primes !! 10001

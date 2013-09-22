@@ -3,6 +3,6 @@ module Problems.Problem_76
     ( problem_76
     ) where
 
-import Utils.Misc
+import Utils.Misc (partitions)
 
 problem_76 = partitions 100 - 1

@@ -3,7 +3,7 @@ module Problems.Problem_41
     ( problem_41
     ) where
 
-import Utils.Prime
-import Utils.Misc
+import Utils.Prime (primes)
+import Utils.Misc (is_pandigitalr)
 
 problem_41 = [n | n <- primes, is_pandigitalr (1,(length . show) n) n]

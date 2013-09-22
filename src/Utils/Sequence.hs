@@ -7,8 +7,8 @@ module Utils.Sequence
     , farey_seq_length
     ) where
 
-import Data.Ratio
-import Utils.Misc
+import Data.Ratio ((%),denominator,numerator)
+import Utils.Misc (euler_totient)
 
 -- Collatz Sequence starting at n.
 collatz 1 = []
