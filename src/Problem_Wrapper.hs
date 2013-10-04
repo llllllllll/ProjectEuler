@@ -77,6 +77,7 @@ module Problem_Wrapper
     , module Problems.Problem_26
     , module Problems.Problem_102
     , module Problems.Problem_17
+    , module Problems.Problem_81
     ) where
 
 import Problems.Problem_1
@@ -153,3 +154,4 @@ import Problems.Problem_19
 import Problems.Problem_26
 import Problems.Problem_102
 import Problems.Problem_17
+import Problems.Problem_81
