@@ -62,7 +62,7 @@ Day::Day(){
 
 // Checks if the date should be counted by the rules of the problem.
 bool Day::is_counted(){
-    return weekday == 0 && day == 1; 
+    return weekday == 0 && day == 1;
 }
 
 // Debugging use.

@@ -1,8 +1,9 @@
--- Joe Jevnik
+-- |
+-- Name: Joe Jevnik
 -- Date: 31.7.2013
 -- A neat wrapper module for all my problems in Haskell.
 -- Automatically generated imports and exports, do not edit.
-module Problem_Wrapper 
+module Problem_Wrapper
     ( module Problems.Problem_1
     , module Problems.Problem_2
     , module Problems.Problem_3
@@ -141,7 +142,7 @@ import Problems.Problem_99
 import Problems.Problem_108
 import Problems.Problem_112
 import Problems.Problem_124
-import Problems.Problem_142 
+import Problems.Problem_142
 import Problems.Problem_171
 import Problems.Problem_188
 import Problems.Problem_206

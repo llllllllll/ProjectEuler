@@ -1,6 +1,6 @@
 -- 233168 - Completed 29.4.2013
-module Problems.Problem_1 
-    ( problem_1 
+module Problems.Problem_1
+    ( problem_1
     , problem_1'
     ) where
 

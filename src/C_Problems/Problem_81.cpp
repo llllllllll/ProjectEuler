@@ -16,7 +16,7 @@ int main(){
     int r = 0;
     while (getline(txt,ln)){
 	parse_ln(ln,r++);
-    } 
+    }
     fill_cost_mat();
     cout << g[79][79];
     txt.close();
