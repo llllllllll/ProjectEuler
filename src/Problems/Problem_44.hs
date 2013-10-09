@@ -3,7 +3,7 @@ module Problems.Problem_44
     ( problem_44
     ) where
 
-import Utils.Misc
+import Utils.Number (is_int)
 
 problem_44 = [pent_num a - pent_num b 
              | a <- [1..5000], b <- [1..a], 

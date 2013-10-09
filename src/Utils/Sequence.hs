@@ -8,7 +8,7 @@ module Utils.Sequence
     ) where
 
 import Data.Ratio ((%),denominator,numerator)
-import Utils.Misc (euler_totient)
+import Utils.Number (euler_totient)
 
 -- Collatz Sequence starting at n.
 collatz 1 = []

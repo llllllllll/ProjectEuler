@@ -4,7 +4,7 @@ module Problems.Problem_243
     ) where
 
 import Data.Ratio
-import Utils.Misc
+import Utils.Number (euler_totient)
 
 problem_243 = head nums
     where

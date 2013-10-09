@@ -3,9 +3,9 @@ module Problems.Problem_95
     ( problem_95
     ) where
 
-import Data.List
-import Data.Function
-import Utils.Misc
+import Data.List (sortBy)
+import Data.Function (on)
+import Utils.Number (divisors)
 
 problem_95 = last $ sortBy (compare `on` (length . snd)) 
              [(n, a_chain n [n]) | n <- [1..10^6]]

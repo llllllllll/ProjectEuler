@@ -3,7 +3,7 @@ module Problems.Problem_23
     ( problem_23
     ) where
 
-import Utils.Misc (divisors)
+import Utils.Number (divisors)
 
 problem_23 = [a + b | a <- abundants, b <- takeWhile (<=a) abundants, 
               a + b < 28123]

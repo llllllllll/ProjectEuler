@@ -4,7 +4,7 @@ module Problems.Problem_34
     ) where
 
 import Utils.List (int_to_list)
-import Utils.Misc (factorial)
+import Utils.Number (factorial)
 
 problem_34 = sum [x | x <- [3..99999], is_curious x]
     where

@@ -3,6 +3,6 @@ module Problems.Problem_15
     ( problem_15
     ) where
 
-import Utils.Misc (nCr)
+import Utils.Number (nCr)
 
 problem_15 = 40 `nCr` 20 

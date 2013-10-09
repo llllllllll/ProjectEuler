@@ -3,9 +3,9 @@ module Problems.Problem_62
     ( problem_62
     ) where
 
-import Data.List
-import Utils.Misc
-import Utils.List
+import Data.List (permutations,nub)
+import Utils.Number (is_cube)
+import Utils.List (int_to_list,list_to_int)
 
 problem_62 = [n | n <- cubes, is_valid n]
     where

@@ -4,7 +4,7 @@ module Problems.Problem_74
     ) where
 
 import Utils.List (int_to_list)
-import Utils.Misc (factorial)
+import Utils.Number (factorial)
 
 problem_74 = length [f_chain n| n <- [1..999999], is_valid n]
     where
