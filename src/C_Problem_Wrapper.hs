@@ -26,11 +26,11 @@ import System.Process (system,readProcess)
 -- |Compiles the c/c++ problem_p, prints the output then delets the binary.
 eval :: Int -> IO ()
 eval p = do
-    us <- concat . intersperse " "
-          . filter (\p -> p `notElem` [".",".."] && ".h" `isSuffixOf` p)
-          <$> getDirectoryContents "C_Problems/Utils"
+    us <- (:) ' ' . concat . intersperse " "
+          . filter (\p -> p `notElem` [".",".."] && ".cpp" `isSuffixOf` p)
+                <$> getDirectoryContents "C_Problems/Utils"
     system $ "g++ -o C_Problems/temp_proc C_Problems/Problem_"
-               ++ show p ++ ".cpp -lm -lgmp -Wall " ++ us
+               ++ show p ++ ".cpp " ++ us ++ " -lm -lgmp -Wall"
     readProcess "C_Problems/temp_proc" [] [] >>= putStrLn
     removeFile "C_Problems/temp_proc"
 
