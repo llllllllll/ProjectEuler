@@ -1,6 +1,5 @@
 -- 1.002322108633 (Paper/Pencil)- Completed 11.5.2013 - 
-module Problems.
-module Problem_235
+module Problems.Problem_235
     ( problem_235
     ) where
 
