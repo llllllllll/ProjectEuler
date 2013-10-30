@@ -50,7 +50,7 @@ open_problem :: Int -> IO ()
 open_problem p = do
     s <- check_status p
     if s `elem` ["Complete","Incomplete"]
-      then void (system $ "emacs Problems/Problem_" ++ show p ++ ".hs &")
+      then void (system $ "emacs Problems/Problem_" ++ show p ++ ".hs")
       else do
           putStr $ "Problem "  ++ show p ++
                      " has not been started, Would you like to start it (Y/n):"
@@ -60,14 +60,13 @@ open_problem p = do
                                               ++ "\" > Problems/Problem_"
                                                      ++ show p ++ ".hs"))
                      >> (system $ "emacs Problems/Problem_"
-                                    ++ show p ++ ".hs &")
+                                    ++ show p ++ ".hs")
                      >> appendFile dot_incomplete (show p)
                      >> wrap_import p >> mark_incomplete p
   where
       problem_template n = "-- NOT YET COMPLETED.\nmodule Problems.Problem_"
                            ++ show n ++ "\n    ( problem_" ++ show n
-                           ++ "\n    ) where\n\nproblem_" ++ show n
-                           ++ " = "
+                           ++ "\n    ) where\n\nproblem_" ++ show n ++ " = "
 
 -- |Marks problem_p as complete.
 mark_complete :: Int -> IO ()

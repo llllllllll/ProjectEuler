@@ -2,19 +2,12 @@
 #include <stdlib.h>
 #include <gmp.h>
 
-int main(){
-    void nCr(int,int);
-    nCr(40,20);
-}
+#include "../C_Utils/number.h"
 
-void nCr(int n,int r){
-    mpz_t res,num,den,den_1,den_2;
-    mpz_inits(res,num,den,den_1,den_2,NULL);
-    mpz_fac_ui(num,n);
-    mpz_fac_ui(den_1,r);
-    mpz_fac_ui(den_2,n-r);
-    mpz_mul(den,den_1,den_2);
-    mpz_cdiv_q(res,num,den);
-    gmp_printf ("%Zd",res);
-    mpz_clears(res,num,den,den_1,den_2,NULL);
+int main(){
+    mpz_t res;
+    mpz_init(res);
+    nCr(res,40,20);
+    gmp_printf("%Zd",res);
+    mpz_clear(res);
 }

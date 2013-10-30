@@ -1,18 +1,13 @@
 // NOT YET COMPLETED.
 #include <stdlib.h>
-#include <iostream>
+#include <stdio.h>
 #include <string.h>
 
+#include "../C_Utils/string.h"
 
-
-
-
-char *reverse(char *in,char *out){
-    if (strlen(in) == 0)
-	return out;
-    return reverse(&in[1],(strcat(out,&in[0],out)));
-}
 
 int main(){
-    std::cout << reverse("thisisatest","");
+    char *t = reverse("testing");
+    printf("%s\n",t);
+    free(t);
 }

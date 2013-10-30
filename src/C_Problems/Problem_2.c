@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "../C_Utils/sequence.h"
+
 int main(){
-    int fib(int);
     int sum = 0;
     for (int n = 3;1;n++){
 	int m = fib(n);
@@ -12,12 +13,5 @@ int main(){
 	else
 	    sum = (m % 2 == 0) ? sum + m : sum;
     }
-    printf("%d",sum);
-}
-
-int fib(int n){
-    if (n==1 || n==2)
-	return 1;
-    else
-	return fib(n-1) + fib(n-2);
+    printf("%d\n",sum);
 }

@@ -64,13 +64,12 @@ open_problem p = do
                                 ++ "\" > C_Problems/Problem_"
                                 ++ show p ++ ".c"))
                      >> (system $ "emacs C_Problems/Problem_"
-                                    ++ show p ++ ".c &")
+                                    ++ show p ++ ".c")
                      >> appendFile dot_incomplete (show p)
                      >> wrap_import p >> mark_incomplete p
   where
       problem_template n = "// NOT YET COMPLETED.\n#include <stdlib.h>\n"
-                           ++ "#include <stdio.h>\n\n"
-                           ++ "int main(){\n    \n}"
+                           ++ "#include <stdio.h>\n\nint main(){\n    \n}"
 
 -- |Marks problem_p as complete.
 mark_complete :: Int -> IO ()

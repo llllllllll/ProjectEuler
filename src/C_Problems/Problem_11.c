@@ -36,7 +36,7 @@ int main(){
     max = (horz > max) ? horz : max;
     max = (diar > max) ? diar : max;
     max = (dial > max) ? dial : max;
-    printf("%ld",max);
+    printf("%ld\n",max);
 }
 
 long chk_vert(int grid[20][20]){

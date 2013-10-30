@@ -26,12 +26,12 @@ import System.Process (system,readProcess)
 -- |Compiles the c problem_p, prints the output then deletes the binary.
 eval :: Int -> IO ()
 eval p = do
-    us <- (:) ' ' . concat . intersperse " "
+    us <- concat . intersperse " " . map ("C_Utils/" ++)
           . filter (\p -> p `notElem` [".",".."] && ".c" `isSuffixOf` p)
                 <$> getDirectoryContents "C_Utils"
     system $ "gcc -o C_Problems/temp_proc -std=c11 C_Problems/Problem_"
                ++ show p ++ ".c " ++ us ++ " -lm -lgmp -Wall"
-    readProcess "C_Problems/temp_proc" [] [] >>= putStrLn
+    readProcess "C_Problems/temp_proc" [] [] >>= putStr
     removeFile "C_Problems/temp_proc"
 
 -- Automatically generated functions.

@@ -116,6 +116,6 @@ int main(){
     t = mpz_get_str(*"",10,sum);
     strncpy(out,t,10);
     out[10] = '\0';
-    printf("%s",out);
+    printf("%s\n",out);
     mpz_clear(sum);
 }
