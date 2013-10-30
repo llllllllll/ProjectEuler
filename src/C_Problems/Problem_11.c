@@ -1,13 +1,13 @@
 // 70600674 - Completed 8.27.2013
 #include <stdlib.h>
-#include <iostream>
+#include <stdio.h>
 #include <gmp.h>
 
 int main(){
     long chk_vert(int[20][20]),chk_horz(int[20][20]),chk_diar(int[20][20]),
 	chk_dial(int[20][20]);
     long max = 0, vert = 0, horz = 0, diar = 0, dial = 0;
-    int grid[20][20] = 
+    int grid[20][20] =
 	{{8,2,22,97,38,15,00,40,00,75,4,5,7,78,52,12,50,77,91,8},
 	 {49,49,99,40,17,81,18,57,60,87,17,40,98,43,69,48,04,56,62,00},
 	 {81,49,31,73,55,79,14,29,93,71,40,67,53,88,30,03,49,13,36,65},
@@ -36,7 +36,7 @@ int main(){
     max = (horz > max) ? horz : max;
     max = (diar > max) ? diar : max;
     max = (dial > max) ? dial : max;
-    std::cout << max;
+    printf("%ld",max);
 }
 
 long chk_vert(int grid[20][20]){

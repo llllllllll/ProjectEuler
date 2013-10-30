@@ -1,7 +1,7 @@
 // NOT YET COMPLETED.
 #include <stdlib.h>
-#include <iostream>
-#include <math.h> 
+#include <stdio.h>
+#include <math.h>
 
 int main(){
     int is_prime_factor(long,long);
@@ -10,7 +10,7 @@ int main(){
     for (int n = 2; n <= max; n++){
 	ans = (is_prime_factor(n,600851475143)) ? n : ans;
     }
-    std::cout << ans;
+    printf("%ld",ans);
 }
 
 int is_prime_factor(long n,long num){

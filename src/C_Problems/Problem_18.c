@@ -1,9 +1,7 @@
 // 1074 - Completed 9.8.2013
 #include <stdlib.h>
-#include <iostream>
+#include <stdio.h>
 #include <gmp.h>
-using namespace std;
-
 
 int main(){
     void step_up(int[][15],int);
@@ -27,7 +25,7 @@ int main(){
 	step_up(g,r);
 	r--;
     }
-    cout << g[0][0];
+    printf("%d",g[0][0]);
 }
 
 void step_up(int g[][15],int r){
@@ -39,4 +37,3 @@ void step_up(int g[][15],int r){
 	g[r-1][n] = g[r-1][n] + temp[n];
     }
 }
-    

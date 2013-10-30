@@ -1,6 +1,6 @@
 // 648 - Completed 8.23.2013
 #include <stdlib.h>
-#include <iostream>
+#include <stdio.h>
 #include <string.h>
 #include <gmp.h>
 
@@ -15,5 +15,5 @@ int main(){
 	sum += fac_str[n] - '0';
     }
     mpz_clear(fac);
-    std::cout << sum;
+    printf("%d",sum);
 }

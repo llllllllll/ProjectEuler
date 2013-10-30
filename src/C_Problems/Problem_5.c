@@ -1,6 +1,6 @@
 // 232792560 - Completed 8.21.2013.
 #include <stdlib.h>
-#include <iostream>
+#include <stdio.h>
 #include <math.h>
 
 int main(){
@@ -11,13 +11,13 @@ int main(){
 	t =lcm(f,n);
 	f = t;
     }
-    std::cout << t;
+    printf("%ld",t);
 }
 
 long lcm(long a,long b){
     long gcd(long,long);
     return a*b/gcd(a,b);
-}   
+}
 
 long gcd(long a,long b) {
     if (b == 0) {

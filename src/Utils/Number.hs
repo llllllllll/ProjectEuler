@@ -23,19 +23,20 @@ import Utils.Prime (prime_factors_mult)
 
 -- A list of all divisors of n.
 divisors :: Integral a => a -> [a]
-divisors n = 1:(concat 
-                [[x,n`div`x] 
-                     | x <- [2..floor (sqrt (fromIntegral (n)))], 
-                            n `rem` x == 0] \\ 
-                (if is_square n then [floor (sqrt (fromIntegral n))] 
+divisors n = 1:(concat
+                [[x,n`div`x]
+                     | x <- [2..floor (sqrt (fromIntegral (n)))],
+                            n `rem` x == 0] \\
+                (if is_square n then [floor (sqrt (fromIntegral n))]
                  else []))
 
 -- A list of all divisors of n in reverse order.
 r_divisors :: Integral a => a -> [a]
 r_divisors n = [x | x <- [n, n-1..1], n `rem` x == 0]
-               
+
 -- factorial n = n!.
-factorial n = product [1..n]
+factorial :: Integral a => a -> a
+factorial n = product [2..n]
 
 -- The number of divisors of n.
 num_divisors :: Integral a => a -> a
@@ -48,7 +49,7 @@ partitions n = c n n
       c _ 0 = 1
       c n m = sum $ map (\x -> l!!(n-x)!!min (n-x) x) [1..m]
       l = [[c n m | m <- [0..n]] | n<-[0..]]
-                  
+
 -- Exponentiation by squares in O(log b).
 exp_by_sq :: (Num a, Integral b) => a -> b -> a
 exp_by_sq a b
@@ -64,17 +65,19 @@ hyper_exp a b
 
 mod_exp :: (Integral a, Bits a) => a -> a -> a -> a
 mod_exp a b c = exp_mod' a b c 1
-  where 
+  where
       exp_mod' a b c s
-          | b == 0    = s
-          | odd b     = exp_mod' (a^2 `rem` c) (shift b (0-1)) c ((s * a) `mod` c)
+          | b == 0 = s
+          | odd b = exp_mod' (a^2 `rem` c) (shift b (0-1)) c ((s * a) `mod` c)
           | otherwise = exp_mod' (a^2 `rem` c) (shift b (0-1)) c s
 
 -- Number of combinations of n choose r.
-n `nCr` r = factorial n / (factorial r * factorial (n-r))
+nCr :: Integral a => a -> a -> a
+n `nCr` r = factorial n `div` (factorial r * factorial (n-r))
 
 -- Number of permutation of n pick r.
-n `nPr` r = factorial n / factorial (n-r)
+nPr :: Integral a => a -> a -> a
+n `nPr` r = factorial n `div` factorial (n-r)
 
 -- Returns if n is an Integral to 7 decimal places.
 is_int :: RealFrac a => a -> Bool
@@ -89,11 +92,11 @@ is_cube :: Integral a => a -> Bool
 is_cube n = (round (fromIntegral (n)**(1/3))) ^3 == n
 
 -- The size of the list of numbers coprime to n.
-euler_totient m = product 
+euler_totient m = product
                   [(p - 1) * p ^ (c - 1) | (p, c) <- prime_factors_mult m]
 
 -- Euclid's Algorithm with forced strictness.
 euclid_gcd :: Integral a => a -> a -> a
-euclid_gcd !a !b
+euclid_gcd (!a) (!b)
     | a `rem` b == 0 = b
     | otherwise = euclid_gcd b (a `rem` b)

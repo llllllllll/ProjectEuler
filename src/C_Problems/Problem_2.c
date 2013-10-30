@@ -1,6 +1,6 @@
 // 4613732 - Completed 20.8.2013
 #include <stdlib.h>
-#include <iostream>
+#include <stdio.h>
 
 int main(){
     int fib(int);
@@ -12,7 +12,7 @@ int main(){
 	else
 	    sum = (m % 2 == 0) ? sum + m : sum;
     }
-    std::cout << sum;
+    printf("%d",sum);
 }
 
 int fib(int n){

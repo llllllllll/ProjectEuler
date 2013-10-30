@@ -1,6 +1,6 @@
 -- Joe Jevnik
 -- Date: 20.8.2013
--- A neat wrapper module for all problems completed in c/c++.
+-- A neat wrapper module for all problems completed in c.
 module C_Problem_Wrapper
     ( problem_1
     , problem_2
@@ -23,14 +23,14 @@ import Data.List (intersperse,isSuffixOf)
 import System.Directory (removeFile,getDirectoryContents)
 import System.Process (system,readProcess)
 
--- |Compiles the c/c++ problem_p, prints the output then delets the binary.
+-- |Compiles the c problem_p, prints the output then deletes the binary.
 eval :: Int -> IO ()
 eval p = do
     us <- (:) ' ' . concat . intersperse " "
-          . filter (\p -> p `notElem` [".",".."] && ".cpp" `isSuffixOf` p)
-                <$> getDirectoryContents "C_Problems/Utils"
-    system $ "g++ -o C_Problems/temp_proc C_Problems/Problem_"
-               ++ show p ++ ".cpp " ++ us ++ " -lm -lgmp -Wall"
+          . filter (\p -> p `notElem` [".",".."] && ".c" `isSuffixOf` p)
+                <$> getDirectoryContents "C_Utils"
+    system $ "gcc -o C_Problems/temp_proc -std=c11 C_Problems/Problem_"
+               ++ show p ++ ".c " ++ us ++ " -lm -lgmp -Wall"
     readProcess "C_Problems/temp_proc" [] [] >>= putStrLn
     removeFile "C_Problems/temp_proc"
 

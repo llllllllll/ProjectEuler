@@ -1,6 +1,6 @@
 // 5537376230 - Completed 8.23.2013
 #include <stdlib.h>
-#include <iostream>
+#include <stdio.h>
 #include <string.h>
 #include <gmp.h>
 
@@ -116,7 +116,6 @@ int main(){
     t = mpz_get_str(*"",10,sum);
     strncpy(out,t,10);
     out[10] = '\0';
-    std::cout << out;
+    printf("%s",out);
     mpz_clear(sum);
 }
-

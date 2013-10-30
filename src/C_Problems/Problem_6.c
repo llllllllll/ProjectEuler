@@ -1,7 +1,7 @@
 // 25164150 - Completed 8.23.2013
 #include <stdlib.h>
 #include <gmp.h>
-#include <iostream>
+#include <stdio.h>
 
 int main(){
     mpz_t sum_sq,sq_sum,ans;

@@ -54,7 +54,7 @@ open_problem :: Int -> IO ()
 open_problem p = do
     s <- check_status p
     if s `elem` ["Complete","Incomplete"]
-      then void (system $ "emacs C_Problems/Problem_" ++ show p ++ ".cpp &")
+      then void (system $ "emacs C_Problems/Problem_" ++ show p ++ ".c")
       else do
           putStr $ "Problem " ++ show p ++
                      " has not been started, Would you like to start it (Y/n):"
@@ -62,14 +62,14 @@ open_problem p = do
           unless (inp `elem` ["n","N"])
                      $ (system ("echo \"" ++ problem_template p
                                 ++ "\" > C_Problems/Problem_"
-                                ++ show p ++ ".cpp"))
+                                ++ show p ++ ".c"))
                      >> (system $ "emacs C_Problems/Problem_"
-                                    ++ show p ++ ".cpp &")
+                                    ++ show p ++ ".c &")
                      >> appendFile dot_incomplete (show p)
                      >> wrap_import p >> mark_incomplete p
   where
       problem_template n = "// NOT YET COMPLETED.\n#include <stdlib.h>\n"
-                           ++ "#include <iostream>\n#include <gmp.h>\n\n"
+                           ++ "#include <stdio.h>\n\n"
                            ++ "int main(){\n    \n}"
 
 -- |Marks problem_p as complete.
