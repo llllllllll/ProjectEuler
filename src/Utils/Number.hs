@@ -92,8 +92,10 @@ is_cube :: Integral a => a -> Bool
 is_cube n = (round (fromIntegral (n)**(1/3))) ^3 == n
 
 -- The size of the list of numbers coprime to n.
-euler_totient m = product
-                  [(p - 1) * p ^ (c - 1) | (p, c) <- prime_factors_mult m]
+euler_totient :: Integer -> Integer
+euler_totient 1 = 1
+euler_totient n = product
+                  [(p - 1) * p ^ (c - 1) | (p, c) <- prime_factors_mult n]
 
 -- Euclid's Algorithm with forced strictness.
 euclid_gcd :: Integral a => a -> a -> a
