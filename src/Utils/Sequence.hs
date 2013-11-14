@@ -15,7 +15,7 @@ collatz 1 = []
 collatz n
     | even n = n:collatz (n`div`2)
     | odd n = n:collatz (n*3+1)
-              
+
 -- Memoized Collatz Sequence starting at n.
 collatz_mem = ((map c [0..])!!)
     where
@@ -30,9 +30,9 @@ fib = ((map f [0..])!!)
 	f 0 = 0
 	f 1 = 1
 	f n = fib (n - 2) + fib (n - 1)
-       
+
 -- A Fibbonacci term without memoization.
-slow_fib :: Int -> Int     
+slow_fib :: Int -> Int
 slow_fib 0 = 0
 slow_fib 1 = 1
 slow_fib n = slow_fib (n-2) + slow_fib (n-1)
