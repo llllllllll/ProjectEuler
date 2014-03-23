@@ -10,4 +10,5 @@ int main(){
     nCr(res,40,20);
     gmp_printf("%Zd",res);
     mpz_clear(res);
+    return 0;
 }

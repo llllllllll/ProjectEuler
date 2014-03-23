@@ -25,15 +25,18 @@ int main(){
 	step_up(g,r);
 	r--;
     }
-    printf("%d",g[0][0]);
+    printf("%d\n",g[0][0]);
+    return 0;
 }
 
 void step_up(int g[][15],int r){
-    int temp[r];
-    for (int n = 0;n < r + 1;n++){
+    int *temp = malloc(r * sizeof(int));
+    int n;
+    for (n = 0;n < r + 1;n++){
 	temp[n] = (g[r][n] > g[r][n+1]) ? g[r][n] : g[r][n+1];
     }
-    for (int n = 0;n < r + 1;n++){
+    for (n = 0;n < r + 1;n++){
 	g[r-1][n] = g[r-1][n] + temp[n];
     }
+    free(temp);
 }

@@ -5,12 +5,12 @@
 #include "../C_Utils/number.h"
 
 int main(){
-    long lcm(long,long);
     long f = 1;
-    long t;
-    for (long n = 1;n <= 20;n++){
+    long t,n;
+    for (n = 1;n <= 20;n++){
 	t = lcm(f,n);
 	f = t;
     }
     printf("%ld\n",t);
+    return 0;
 }

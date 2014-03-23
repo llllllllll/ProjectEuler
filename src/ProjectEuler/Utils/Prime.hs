@@ -23,31 +23,31 @@ import Data.List (group)
 -- | An infinite list of prime numbers.
 primes :: [Integer]
 primes = 2: 3: sieve (tail primes) [5,7..]
-    where
-        sieve (p:ps) xs = n ++ sieve ps [x | x <- ns, x `rem` p /= 0]
-            where (n,~(_:ns)) = span (< p*p) xs
+  where
+      sieve (p:ps) xs = n ++ sieve ps [x | x <- ns, x `rem` p /= 0]
+          where (n,~(_:ns)) = span (< p*p) xs
 
 -- | The prime factors of n.
 primeFactors :: Integer -> [Integer]
 primeFactors n = factor primes n
-    where
-        factor ps@(p:pt) n
-            | p * p > n    = [n]
-            | rem n p == 0 = p : factor ps (quot n p)
-            | otherwise    =     factor pt n
+  where
+      factor ps@(p:pt) n
+          | p * p > n    = [n]
+          | rem n p == 0 = p : factor ps (quot n p)
+          | otherwise    =     factor pt n
 
 primeFactorsMult :: Integer -> [(Integer, Int)]
 primeFactorsMult = map f . group . primeFactors
-    where f xs = (head xs, length xs)
+  where f xs = (head xs, length xs)
 
 -- | A Bool representing the primality of n.
 isPrime :: Integral a => a -> Bool
 isPrime n = isPrime' n (floor $ sqrt $ fromIntegral n)
-    where
-        isPrime' n i
-            | i == 1 && n > 1    = True
-            | n == i*(n `div` i) = False
-            | otherwise = isPrime' n (i - 1)
+  where
+      isPrime' n i
+          | i == 1 && n > 1      = True
+          | n == i * (n `div` i) = False
+          | otherwise            = isPrime' n (i - 1)
 
 -- | An attempt at fermats little theorem.
 isPrime' :: Integral a => a -> Bool

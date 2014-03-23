@@ -70,3 +70,7 @@ import ProjectEuler.Problems.Problem145 as M
 import ProjectEuler.Problems.Problem235 as M
 
 import ProjectEuler.Problems.Problem200 as M
+import ProjectEuler.Problems.Problem23 as M
+import ProjectEuler.Problems.Problem27 as M
+import ProjectEuler.Problems.Problem37 as M
+import ProjectEuler.Problems.Problem95 as M

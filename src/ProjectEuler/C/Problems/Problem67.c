@@ -25,6 +25,7 @@ int main(){
     }
     printf("%d\n",g[0][0]);
     fclose(txt);
+    return 0;
 }
 
 void step_up(int g[][100],int r){

@@ -3,14 +3,16 @@
 #include <stdio.h>
 #include <math.h>
 
+int is_prime_factor(long,long);
+
 int main(){
-    int is_prime_factor(long,long);
     long ans = 0;
     long max = (long) sqrt(600851475143);
     for (int n = 2; n <= max; n++){
 	ans = (is_prime_factor(n,600851475143)) ? n : ans;
     }
-    printf("%ld",ans);
+    printf("%ld\n",ans);
+    return 0;
 }
 
 int is_prime_factor(long n,long num){

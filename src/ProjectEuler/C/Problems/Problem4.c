@@ -10,4 +10,5 @@ int main(){
     char *t = reverse("testing");
     printf("%s\n",t);
     free(t);
+    return 0;
 }

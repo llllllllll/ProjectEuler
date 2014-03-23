@@ -32,17 +32,17 @@ import System.Process      (system)
 
 import ProjectEuler.C.Problems
 
--- | The file used to neatly wrap all problems to be imported by the Main module.
+-- | The file used to neatly wrap all problems to be imported by the C module.
 problemWrapper :: FilePath
-problemWrapper = "/home/joejev/compsci/ProjectEuler/src/CProblemWrapper.hs"
+problemWrapper = "ProjectEuler/C/Problems.hs"
 
 -- | The file containing the list of completed problems.
 dotComplete :: FilePath
-dotComplete = "/home/joejev/compsci/ProjectEuler/src/CProblems/.complete"
+dotComplete = "ProjectEuler/C/Problems/.complete"
 
 -- | The file containing the list of incomplete problems.
 dotIncomplete :: FilePath
-dotIncomplete = "/home/joejev/compsci/ProjectEuler/src/CProblems/.incomplete"
+dotIncomplete = "ProjectEuler/C/Problems/.incomplete"
 
 -- | Returns the completion status of problemP
 checkStatus :: Int -> IO String
@@ -61,18 +61,19 @@ openProblem :: Int -> IO ()
 openProblem p = do
     s <- checkStatus p
     if s `elem` ["Complete","Incomplete"]
-      then void (system $ "emacs CProblems/Problem" ++ show p ++ ".c")
+      then void (system $ "emacs " ++ prob p ++ ".c")
       else do
-          putStr $ "Problem " ++ show p ++
-                     " has not been started, Would you like to start it (Y/n):"
+          putStr $ "Problem " ++ show p
+           ++ " has not been started, Would you like to start it (Y/n):"
           inp <- getLine
           unless (inp `elem` ["n","N"])
                      $ (system ("echo \"" ++ problemTemplate p
-                                ++ "\" > CProblems/Problem" ++ show p ++ ".c"))
-                     >> (system $ "emacs CProblems/Problem" ++ show p ++ ".c")
+                                ++ "\" > " ++ prob p ++ ".c"))
+                     >> (system $ "emacs " ++ prob p ++ ".c")
                      >> appendFile dotIncomplete (show p)
                      >> wrapImport p >> markIncomplete p
   where
+      prob = (++) "ProjectEuler/C/Problems/Problem" . show
       problemTemplate n = "// NOT YET COMPLETED.\n#include <stdlib.h>\n"
                           ++ "#include <stdio.h>\n\nint main(){\n    \n}"
 
@@ -109,7 +110,7 @@ markNotStarted p = do
     appendFile dotComplete $ unlines cs'
     appendFile dotIncomplete $ unlines ws'
 
--- | Adds a problem to the CProblemWrapper list.
+-- | Adds a problem to the C problem wrapper import list.
 wrapImport :: Int -> IO ()
 wrapImport p = do
     ls <- fmap (break (=="    ) where") . lines) $ readFile problemWrapper
@@ -120,7 +121,7 @@ wrapImport p = do
     removeFile problemWrapper
     appendFile problemWrapper edits
 
--- | Removes a problem from the CProblemWrapper import list.
+-- | Removes a problem from the C problem wrapper import list.
 unwrapImport :: Int -> IO ()
 unwrapImport p = do
     ls <- lines <$> readFile problemWrapper
@@ -131,12 +132,12 @@ unwrapImport p = do
 
 -- | Returns a list of problems that are completed.
 lsComplete :: IO [Int]
-lsComplete = sort . (map read) . filter (/="") . lines
+lsComplete = sort . map read . filter (/= "") . lines
              <$> readFile dotComplete
 
 -- | Returns a list of problems that are incomplete.
 lsIncomplete :: IO [Int]
-lsIncomplete = sort . (map read) . filter (/="") . lines
+lsIncomplete = sort . map read . filter (/= "") . lines
                <$> readFile dotIncomplete
 
 -- | Returns the number of problems that are marked complete.

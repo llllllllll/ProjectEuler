@@ -12,7 +12,10 @@
 {-# LANGUAGE BangPatterns #-}
 
 module ProjectEuler.Utils.Number
-    ( divisors     -- :: Integral a => a -> [a]
+    ( iSqrt        -- :: (Integral a,Integral b) => a -> b
+    , fermatFactor -- :: Integral a => a -> (a,a)
+    , divisors     -- :: Integral a => a -> [a]
+    , pDivisors    -- :: Integral a => a -> [a]
     , rDivisors    -- :: Integral a => a -> [a]
     , numDivisors  -- :: (Integral a,Integral b) => a -> b
     , factorial    -- :: Integral a => a -> a
@@ -29,17 +32,37 @@ module ProjectEuler.Utils.Number
     , euclidGCD    -- :: Integral a => a -> a -> a
     ) where
 
-import Data.Bits               (Bits(..),shift)
-import Data.List               (genericLength,nub,(\\))
+import Data.Bits                (Bits(..),shift)
+import Data.List                (genericLength,nub,(\\))
 import ProjectEuler.Utils.Prime (primeFactorsMult)
+
+-- | Integer sqrt.
+-- Warning: Only is valid if n is a perfect square
+iSqrt :: (Integral a,Integral b) => a -> b
+iSqrt = round . sqrt . fromIntegral
+
+-- | Factors using fermats method.
+fermatFactor :: Integral a => a -> (a,a)
+fermatFactor n = let a = ceiling . sqrt . fromIntegral $ n
+                     b = a^2 - n
+                 in f a b n
+  where
+      f a b n = if isSquare b
+                  then (a - iSqrt b,a + iSqrt b)
+                  else f (a + 1) ((a + 1)^2 - n) n
 
 -- | A list of all divisors of n.
 divisors :: Integral a => a -> [a]
-divisors n = n:1:(concat [[x,n`div`x] | x <- [2..floor $ sqrt $ fromIntegral n]
-                         , n `rem` x == 0]
-                  \\ if isSquare n
-                       then [floor $ sqrt $ fromIntegral n]
-                       else [])
+divisors n = (if isSquare n
+                then init
+                else id) $ n : 1
+             : (concat [[x,n`div`x] | x <- [2..iSqrt n], n `rem` x == 0])
+
+pDivisors :: Integral a => a -> [a]
+pDivisors 1 = [1]
+pDivisors n = case divisors n of
+                  [_,1]  -> [1]
+                  ds     -> tail ds
 
 -- | A list of all divisors of n in reverse order.
 rDivisors :: Integral a => a -> [a]
@@ -80,8 +103,8 @@ hyperExp a b = expBySq a (hyperExp a (b - 1))
 modExp :: (Integral a, Bits a) => a -> a -> a -> a
 modExp a b c = expMod' a b c 1
   where
+      expMod' _ 0 _ s = s
       expMod' a b c s
-          | b == 0 = s
           | odd b = expMod' (a^2 `rem` c) (shift b (0 - 1)) c ((s * a) `mod` c)
           | otherwise = expMod' (a^2 `rem` c) (shift b (0 - 1)) c s
 

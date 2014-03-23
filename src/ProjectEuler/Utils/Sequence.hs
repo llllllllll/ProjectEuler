@@ -29,7 +29,7 @@ collatz :: Integral a => a -> [a]
 collatz 1 = []
 collatz n
     | even n = n:collatz (n `div` 2)
-    | odd n = n:collatz (n * 3 + 1)
+    | odd n  = n:collatz (n * 3 + 1)
 
 -- | Memoized Collatz Sequence starting at n.
 collatzMem :: Int -> [Int]
@@ -38,13 +38,13 @@ collatzMem = ((map c [0..])!!)
 	c 1 = [1]
 	c n
             | even n = n : collatzMem (n `div` 2)
-            | odd n = n : collatzMem (n * 3 + 1)
+            | odd n  = n : collatzMem (n * 3 + 1)
 
 -- | The nth fibonacci number.
 -- Credit to: http://www.haskell.org/haskellwiki/The_Fibonacci_sequence
 fib :: Int -> Integer
 fib n = snd . foldl' fib' (1, 0) . dropWhile not
-        $ [testBit n k | k <- let s = bitSize n in [s-1,s-2..0]]
+        $ [testBit n k | k <- let s = bitSize n in [s - 1,s - 2..0]]
     where
         fib' (f, g) p
             | p         = (f * (f + 2 * g),ss)
@@ -68,11 +68,11 @@ fareySeqTerm a b p
     | da2 <= p = fareySeqTerm a1 b p
     | otherwise = na % nb
   where
-      na = numerator a
-      nb = numerator b
-      da = denominator a
-      db = denominator b
-      a1 = (na + nb) % (da + db)
+      na  = numerator a
+      nb  = numerator b
+      da  = denominator a
+      db  = denominator b
+      a1  = (na + nb) % (da + db)
       da2 = denominator a1
 
 -- | The length of the farey Sequence of order n.

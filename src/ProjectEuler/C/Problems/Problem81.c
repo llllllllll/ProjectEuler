@@ -13,6 +13,7 @@ int main(){
     fill_cost_mat(g);
     //printf("%d\n",g[79][79]);
     fclose(txt);
+    return 0;
 }
 
 

@@ -16,4 +16,5 @@ int main(){
     mpz_sub(ans,sum_sq,sq_sum);
     gmp_printf("%Zd",ans);
     mpz_clears(sq_sum,sum_sq,ans,NULL);
+    return 0;
 }

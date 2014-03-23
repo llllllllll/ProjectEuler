@@ -5,13 +5,14 @@
 #include "../C_Utils/sequence.h"
 
 int main(){
-    int sum = 0;
-    for (int n = 3;1;n++){
-	int m = fib(n);
+  int sum = 0,n,m;
+    for (n = 3;1;n++){
+	m = fib(n);
 	if (m >= 4000000)
-	    break;
+            break;
 	else
 	    sum = (m % 2 == 0) ? sum + m : sum;
     }
     printf("%d\n",sum);
+    return 0;
 }

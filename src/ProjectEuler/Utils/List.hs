@@ -22,12 +22,12 @@ import Data.Char (digitToInt)
 
 -- | Convert an Integral to a list of its digits. eg: intToList 123 = [1,2,3].
 intToList :: (Show a,Integral a) => a -> [Int]
-intToList n = map digitToInt $ show n
+intToList = map digitToInt . show
 
 -- | Inverse of intToList. Convert a list into an Integral where each element
 -- is a digit. eg: listToInt [1,2,3] = 123.
 listToInt :: (Show a,Integral a,Read b,Integral b) => [a] -> b
-listToInt ns = read $ concatMap show ns
+listToInt = read . concatMap show
 
 -- | The number of times n occurs in list ns.
 elemCount :: Eq a => a -> [a] -> Int
@@ -43,8 +43,8 @@ splitOn p s =  case dropWhile p s of
 
 -- | Returns the first d digits of n.
 headN :: (Integral b, Integral a, Read b, Show a) => Int -> a -> b
-headN d n = listToInt $ take d (intToList n)
+headN d = listToInt . take d . intToList
 
 -- | Returns the last d digits of n.
 lastN :: (Integral a, Integral b) => b -> a -> a
-lastN d n = n `rem` (10 ^ d)
+lastN d n = n `rem` 10^d

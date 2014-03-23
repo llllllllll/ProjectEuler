@@ -68,8 +68,8 @@ isLychrel n = isLychrel' n 0
       isLychrel' n c
           | (reverse . show) n == show n && c /= 0 = False
           | c == 50 = True
-          | otherwise =
-                isLychrel' (listToInt ((reverse . intToList) n) + n) (c + 1)
+          | otherwise = isLychrel'
+                        (listToInt ((reverse . intToList) n) + n) (c + 1)
 
 -- | A Binary Search for arrays
 binarySearch n arr = binarySearch' n arr 0 (aLength arr)
@@ -114,10 +114,9 @@ toRoman :: Int -> String
 toRoman 0 = "N"
 toRoman x = toRoman' x
   where
-      toRoman' x
-	  | x == 0 = ""
-	  | x > 0 = b ++ toRoman' (x - a)
-	    where (a, b) = head $ filter ((<= x) . fst) romanNumerals
+      toRoman' 0 = ""
+      toRoman' x = let (a,b) = head $ filter ((<= x) . fst) romanNumerals
+                   in b ++ toRoman' (x - a)
 
 -- | Parses a string representation of roman numerals into there
 -- arabic numeral equivalent.
@@ -170,12 +169,10 @@ showEngl n
                      then " "
                      else "") ++ showEngl (n `rem` 1000000000)
   where
-      us :: [String]
       us = ["", "one", "two", "three", "four", "five", "six", "seven"
            , "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen"
-           , "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" ]
-
-      ts :: [String]
+           , "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"
+           ]
       ts = [ "",""
            , "twenty"
            , "thirty"

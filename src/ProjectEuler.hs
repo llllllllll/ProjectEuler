@@ -83,7 +83,7 @@ markComplete p = do
     cs <- lines <$> readFile dotComplete
     ws <- lines <$> readFile dotIncomplete
     unless (show p `elem` cs) $ do
-                     let ws' = filter (/=show p) ws
+                     let ws' = filter (/= show p) ws
                      removeFile dotIncomplete
                      appendFile dotIncomplete $ unlines ws'
                      appendFile dotComplete   $ '\n':show p
@@ -94,9 +94,9 @@ markIncomplete p = do
     cs <- lines <$> readFile dotComplete
     ws <- lines <$> readFile dotIncomplete
     unless (show p `elem` ws) $ do
-                       let cs' = filter (/=show p) cs
+                       let cs' = filter (/= show p) cs
                        removeFile dotComplete
-                       appendFile dotComplete $ unlines cs'
+                       appendFile dotComplete   $ unlines cs'
                        appendFile dotIncomplete $ '\n':show p
 
 -- | Marks a problem as not yet started.
@@ -104,39 +104,36 @@ markNotStarted :: Int -> IO ()
 markNotStarted p = do
     cs <- lines <$> readFile dotComplete
     ws <- lines <$> readFile dotIncomplete
-    let cs' = filter (/=show p) cs
-        ws' = filter (/=show p) ws
+    let cs' = filter (/= show p) cs
+        ws' = filter (/= show p) ws
     mapM removeFile [dotIncomplete,dotComplete]
-    appendFile dotComplete $ unlines cs'
+    appendFile dotComplete   $ unlines cs'
     appendFile dotIncomplete $ unlines ws'
 
 -- | Adds a problem to the ProblemWrapper list.
 wrapImport :: Int -> IO ()
 wrapImport p = do
-    ls <- readFile problemWrapper
-    removeFile problemWrapper
-    appendFile problemWrapper
-                   $ ls ++ "\nimport ProjectEuler.Problems.Problem"
-                         ++ show p ++ " as M"
+    appendFile problemWrapper $ "\nimport ProjectEuler.Problems.Problem"
+                   ++ show p ++ " as M"
 
 -- | Removes a problem from the ProblemWrapper import list.
 unwrapImport :: Int -> IO ()
 unwrapImport p = do
     ls <- lines <$> readFile problemWrapper
     let edits = unlines $ filter
-                (\l -> "ProjectEuler.Problems.Problem" ++ show p
+                 (\l -> "ProjectEuler.Problems.Problem" ++ show p
                        `notElem` words l) ls
     removeFile problemWrapper
     appendFile problemWrapper edits
 
 -- | Returns a list of problems that are completed.
 lsComplete :: IO [Int]
-lsComplete = sort . (map read) . filter (/= "") . lines
+lsComplete = sort . map read . filter (/= "") . lines
              <$> readFile dotComplete
 
 -- | Returns a list of problems that are incomplete.
 lsIncomplete :: IO [Int]
-lsIncomplete = sort . (map read) . filter (/= "") . lines
+lsIncomplete = sort . map read . filter (/= "") . lines
                <$> readFile dotIncomplete
 
 -- | Returns the number of problems that are marked complete.

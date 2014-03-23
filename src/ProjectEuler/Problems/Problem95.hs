@@ -1,18 +1,20 @@
 -- NOT COMPLETED.
-module Problems.Problem95
+module ProjectEuler.Problems.Problem95
     ( problem95
+    , aChain
     ) where
 
 import Data.List (sortBy)
 import Data.Function (on)
-import Utils.Number (divisors)
+import Data.Set                  (empty,insert,member,size)
+import ProjectEuler.Utils.Number (pDivisors)
 
-problem95 = last $ sortBy (compare `on` (length . snd)) 
-             [(n, aChain n [n]) | n <- [1..10^6]]
-    where
-	sumDivisors = map (sum . divisors) [1..]
-	aChain n ns
-	    | n == head ns && length ns > 1 = ns
-	    | n `elem` tail ns && length ns > 1 = []
-	    | otherwise = aChain (sumDivisors!!n) (n:ns)
- 
+problem95 = map aChain [100..1000000]
+
+aChain n = let n' = sum . pDivisors $ n
+           in aChain' (sum . pDivisors $ n') n [n',n]
+aChain' n s rs@(r:_)
+    | n > 1000000 = []
+    | n == s      = rs
+    | n == r      = []
+    | otherwise   = aChain' (sum . pDivisors $ n) s (n:rs)

@@ -5,8 +5,9 @@
 #include <gmp.h>
 
 int main(){
+    int n;
     mpz_t temp,sum;
-    char out[11],*t;
+    char *t;
     const char *arr[] = {"37107287533902102798797998220837590246510135740250",
 			 "46376937677490009712648124896970078050417018260538",
 			 "74324986199524741059474233309513058123726617309629",
@@ -108,14 +109,15 @@ int main(){
 			 "20849603980134001723930671666823555245252804609722",
 			 "53503534226472524250874054075591789781264330331690"};
     mpz_init(sum);
-    for (int n = 0;n < 100;n++){
+    for (n = 0;n < 100;n++){
 	mpz_init_set_str(temp,arr[n],10);
 	mpz_add(sum,sum,temp);
 	mpz_clear(temp);
     }
-    t = mpz_get_str(*"",10,sum);
-    strncpy(out,t,10);
-    out[10] = '\0';
-    printf("%s\n",out);
+    t = mpz_get_str(NULL,10,sum);
+    strncpy(t,t,10);
+    t[10] = '\0';
+    puts(t);
     mpz_clear(sum);
+    return 0;
 }
